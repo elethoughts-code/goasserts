@@ -1,0 +1,16 @@
+language: go
+go:
+- 1.x
+- 1.14.x
+- tip
+before_install:
+- curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(go env GOPATH)/bin v1.30.0
+- go get golang.org/x/tools/cmd/cover
+- go get github.com/mattn/goveralls
+script:
+- make mocks lint
+- go test -v -covermode=count -coverprofile=coverage.out
+- $HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
+env:
+  global:
+    secure: V6cnDEBxjDPAkm9fKZp27Gxq7wFAcNodO1XOq2FuYIa20O4R4bbBkImwt2tqF/nq38YRd1tR+W6lfpqVrPMokVi6qNdpB7Rd179v3SHFtlOSGWgcxzXW9e+4kJncauQQJk9I0BaSlJ78luA3u5vAABdX1rZafyM2VVYJ/gdDD0fcRAi8eJPWhwhU85oTMzmg8co+I/BrnllIoZ1Lf15hD4yXDtYmlpw8w1xmBuLvMlhrGxi/h12OPkbYuFcwgz4SFFPhuCnRpCAgGQdXqdr5umftYJK6RFmqh03sbVCBYzfYOuz/4FoYl1JwxmaZWHZUYOk8KhGuyHC8WpTWTruK4aSUlzYD0AUJ+3sW2jgWOL33MiPKldjDerwR0DdqwvZG9+VZjNHjDSQODkdi+FqjPjBKfnGb/T7iWyKCE5mBR7m7QC2h6Yvjv/fkUnmfsccIMGnlD0W2kgcaUa5+xIEKspD2bOVjTPsv3N9oaOit/5tBS6nDDQsNPDtjfwcO5AfHA7/qdm7qwSmv+7d6EPyOVLUFCl2m1sGoYU4vtsQQXpgJw+guL5XWXhY80alCRhqceDBRRt+LuPaz7BZOPr1OwelAgUN0Dg/VLysO8OLbwiy7wqAUSWgJFpRmgMkT0VyaS+AvASnDBilb7L5MJlL0GASafF1Fxvd5LPAYnN2CaYg=
