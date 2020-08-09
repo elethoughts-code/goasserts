@@ -1,6 +1,7 @@
 package assertion_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/elethoughts-code/goasserts/assertion"
@@ -211,14 +212,15 @@ func Test_assert_eq_should_not_pass(t *testing.T) {
 			a: 1,
 			b: 2,
 			expectation: func(tMock *mocks.MockPublicTB) {
-				tMock.EXPECT().Errorf("\nValue is not equal to expectation.\nExpected : %v\nGot : %v", 2, 1)
+				tMock.EXPECT().Error(fmt.Sprintf("\nValue is not equal to expectation.\nExpected : %v\nGot : %v", 2, 1))
 			},
 		},
 		{
 			a: "1",
 			b: "2",
 			expectation: func(tMock *mocks.MockPublicTB) {
-				tMock.EXPECT().Errorf("\nValue is not equal to expectation.\nExpected : %v\nGot : %v", "2", "1")
+				tMock.EXPECT().Error(
+					fmt.Sprintf("\nValue is not equal to expectation.\nExpected : %v\nGot : %v", "2", "1"))
 			},
 		},
 		{
@@ -227,8 +229,8 @@ func Test_assert_eq_should_not_pass(t *testing.T) {
 			expectation: func(tMock *mocks.MockPublicTB) {
 				tMock.
 					EXPECT().
-					Errorf("\nValue is not equal to expectation.\nExpected : %v\nGot : %v",
-						[3]int{100, 200, 400}, [3]int{100, 200, 300})
+					Error(fmt.Sprintf("\nValue is not equal to expectation.\nExpected : %v\nGot : %v",
+						[3]int{100, 200, 400}, [3]int{100, 200, 300}))
 			},
 		},
 	}
@@ -262,14 +264,16 @@ func Test_assert_deep_eq_should_not_pass(t *testing.T) {
 			a: 1,
 			b: 2,
 			expectation: func(tMock *mocks.MockPublicTB) {
-				tMock.EXPECT().Errorf("\nValue is not deep equal to expectation.\nExpected : %v\nGot : %v", 2, 1)
+				tMock.EXPECT().Error(
+					fmt.Sprintf("\nValue is not deep equal to expectation.\nExpected : %v\nGot : %v", 2, 1))
 			},
 		},
 		{
 			a: "1",
 			b: "2",
 			expectation: func(tMock *mocks.MockPublicTB) {
-				tMock.EXPECT().Errorf("\nValue is not deep equal to expectation.\nExpected : %v\nGot : %v", "2", "1")
+				tMock.EXPECT().Error(
+					fmt.Sprintf("\nValue is not deep equal to expectation.\nExpected : %v\nGot : %v", "2", "1"))
 			},
 		},
 		{
@@ -278,8 +282,8 @@ func Test_assert_deep_eq_should_not_pass(t *testing.T) {
 			expectation: func(tMock *mocks.MockPublicTB) {
 				tMock.
 					EXPECT().
-					Errorf("\nValue is not deep equal to expectation.\nExpected : %v\nGot : %v",
-						[3]int{100, 200, 400}, [3]int{100, 200, 300})
+					Error(fmt.Sprintf("\nValue is not deep equal to expectation.\nExpected : %v\nGot : %v",
+						[3]int{100, 200, 400}, [3]int{100, 200, 300}))
 			},
 		},
 	}
@@ -297,6 +301,7 @@ func Test_assert_deep_eq_should_not_pass(t *testing.T) {
 		assert.That(entry.a).IsDeepEq(entry.b)
 	}
 }
+
 func Test_assert_eq_negation_should_not_pass(t *testing.T) {
 	// Mock preparation
 	ctrl := gomock.NewController(t)
@@ -312,14 +317,14 @@ func Test_assert_eq_negation_should_not_pass(t *testing.T) {
 			a: 1,
 			b: 1,
 			expectation: func(tMock *mocks.MockPublicTB) {
-				tMock.EXPECT().Errorf("\nValue should not be equal to : %v", 1)
+				tMock.EXPECT().Error(fmt.Sprintf("\nValue should not be equal to : %v", 1))
 			},
 		},
 		{
 			a: "1",
 			b: "1",
 			expectation: func(tMock *mocks.MockPublicTB) {
-				tMock.EXPECT().Errorf("\nValue should not be equal to : %v", "1")
+				tMock.EXPECT().Error(fmt.Sprintf("\nValue should not be equal to : %v", "1"))
 			},
 		},
 		{
@@ -328,7 +333,7 @@ func Test_assert_eq_negation_should_not_pass(t *testing.T) {
 			expectation: func(tMock *mocks.MockPublicTB) {
 				tMock.
 					EXPECT().
-					Errorf("\nValue should not be equal to : %v", [3]int{100, 200, 300})
+					Error(fmt.Sprintf("\nValue should not be equal to : %v", [3]int{100, 200, 300}))
 			},
 		},
 	}
@@ -357,10 +362,27 @@ func Test_assert_eq_should_not_pass_with_custom_message(t *testing.T) {
 
 	// Expectation
 	tMock.EXPECT().Helper().AnyTimes()
-	tMock.EXPECT().Errorf("This is custom message")
+	tMock.EXPECT().Error("This is custom message")
 
 	// When
-	assert.That(1).Logf("This is custom message").IsEq(2)
+	assert.That(1).Log("This is custom message").IsEq(2)
+}
+
+func Test_assert_eq_should_not_pass_with_custom_formatted_message(t *testing.T) {
+	// Mock preparation
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	// Given
+	tMock := mocks.NewMockPublicTB(ctrl)
+	assert := assertion.New(tMock)
+
+	// Expectation
+	tMock.EXPECT().Helper().AnyTimes()
+	tMock.EXPECT().Error("This is custom message 1 2 3")
+
+	// When
+	assert.That(1).Logf("This is custom message %d %v %s", 1, 2, "3").IsEq(2)
 }
 
 func Test_assert_eq_should_not_pass_and_fail(t *testing.T) {
@@ -374,7 +396,7 @@ func Test_assert_eq_should_not_pass_and_fail(t *testing.T) {
 
 	// Expectation
 	tMock.EXPECT().Helper().AnyTimes()
-	tMock.EXPECT().Fatalf("\nValue is not equal to expectation.\nExpected : %v\nGot : %v", 2, 1)
+	tMock.EXPECT().Fatal(fmt.Sprintf("\nValue is not equal to expectation.\nExpected : %v\nGot : %v", 2, 1))
 
 	// When
 	assert.That(1).OrFatal().IsEq(2)
