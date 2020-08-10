@@ -8,15 +8,33 @@ type Assert interface {
 	That(v interface{}) Expectation
 }
 
+type CommonExpectation interface {
+	Matches(m Matcher)
+	IsEq(e interface{})
+	IsDeepEq(e interface{})
+	IsNil()
+}
+
+type LengthExpectation interface {
+	HasLen(len int)
+	HasMaxLen(len int)
+	HasMinLen(len int)
+	IsEmpty()
+}
+
+type StringExpectation interface {
+	IsBlank()
+}
+
 type Expectation interface {
 	Not() Expectation
 	OrFatal() Expectation
 	Silent() Expectation
 	Logf(format string, args ...interface{}) Expectation
 	Log(log string) Expectation
-	Matches(m Matcher)
-	IsEq(e interface{})
-	IsDeepEq(e interface{})
+	CommonExpectation
+	LengthExpectation
+	StringExpectation
 }
 
 type assert struct {
@@ -100,14 +118,4 @@ func (exp *expectation) Matches(m Matcher) {
 		}
 		exp.handleFailure()
 	}
-}
-
-func (exp *expectation) IsEq(e interface{}) {
-	exp.t.Helper()
-	exp.Matches(IsEq(e))
-}
-
-func (exp *expectation) IsDeepEq(e interface{}) {
-	exp.t.Helper()
-	exp.Matches(IsDeepEq(e))
 }

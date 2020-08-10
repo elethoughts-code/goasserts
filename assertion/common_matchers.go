@@ -38,6 +38,15 @@ func IsEq(e interface{}) Matcher {
 	}
 }
 
+func IsNil() Matcher {
+	return func(v interface{}) MatchResult {
+		if v == nil {
+			return truthy("\nValue should not be nil")
+		}
+		return falsy(fmt.Sprintf("\nValue is not nil : %v", v))
+	}
+}
+
 func IsDeepEq(e interface{}) Matcher {
 	return func(v interface{}) MatchResult {
 		if reflect.DeepEqual(v, e) {
