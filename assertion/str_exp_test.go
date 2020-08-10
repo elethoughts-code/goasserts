@@ -27,6 +27,25 @@ func Test_IsBlank_should_pass(t *testing.T) {
 	// Then nothing
 }
 
+func Test_MatchRe_should_pass(t *testing.T) {
+	// Given
+	assert := assertion.New(t)
+
+	// When
+
+	assert.That("123456").MatchRe("^\\d+$")
+	assert.That("123456a").Not().MatchRe("^\\d+$")
+
+	assert.That([]string{" "}).Not().MatchRe("^\\d+$")
+
+	// Incompatible types (these will be treated with feature #2)
+	assert.That(666).Not().MatchRe("^\\d+$")
+	assert.That(struct{}{}).Not().MatchRe("^\\d+$")
+	assert.That(false).Not().MatchRe("^\\d+$")
+
+	// Then nothing
+}
+
 func Test_String_Matchers_should_fail(t *testing.T) {
 	// Mock preparation
 	ctrl := gomock.NewController(t)
@@ -41,8 +60,20 @@ func Test_String_Matchers_should_fail(t *testing.T) {
 			errLog:     "\nValue is not a blank string : abc",
 		},
 		{
-			assertFunc: func(assert assertion.Assert) { assert.That("").Not().IsBlank() },
-			errLog:     "\nValue should not be blank string",
+			assertFunc: func(assert assertion.Assert) { assert.That("123456").Not().MatchRe("^\\d+$") },
+			errLog:     "\nValue should not match regexp : ^\\d+$",
+		},
+		{
+			assertFunc: func(assert assertion.Assert) { assert.That("123456a").MatchRe("^\\d+$") },
+			errLog:     "\nValue do not match regexp : ^\\d+$",
+		},
+		{
+			assertFunc: func(assert assertion.Assert) { assert.That(123456).MatchRe("^\\d+$") },
+			errLog:     "\nValue type is not a string : 123456",
+		},
+		{
+			assertFunc: func(assert assertion.Assert) { assert.That("123456").MatchRe("^[\\d+$") },
+			errLog:     "\nCannot match for regexp : ^[\\d+$",
 		},
 	}
 

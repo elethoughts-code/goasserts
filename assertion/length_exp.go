@@ -1,5 +1,12 @@
 package assertion
 
+type LengthExpectation interface {
+	HasLen(len int)
+	HasMaxLen(len int)
+	HasMinLen(len int)
+	IsEmpty()
+}
+
 func (exp *expectation) HasLen(len int) {
 	exp.t.Helper()
 	exp.Matches(HasLen(len))

@@ -15,17 +15,6 @@ type CommonExpectation interface {
 	IsNil()
 }
 
-type LengthExpectation interface {
-	HasLen(len int)
-	HasMaxLen(len int)
-	HasMinLen(len int)
-	IsEmpty()
-}
-
-type StringExpectation interface {
-	IsBlank()
-}
-
 type Expectation interface {
 	Not() Expectation
 	OrFatal() Expectation
