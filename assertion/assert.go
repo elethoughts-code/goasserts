@@ -8,13 +8,6 @@ type Assert interface {
 	That(v interface{}) Expectation
 }
 
-type CommonExpectation interface {
-	Matches(m Matcher)
-	IsEq(e interface{})
-	IsDeepEq(e interface{})
-	IsNil()
-}
-
 type Expectation interface {
 	Not() Expectation
 	OrFatal() Expectation
