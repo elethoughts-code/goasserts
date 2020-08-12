@@ -23,11 +23,6 @@ func Test_IsEmpty_should_pass(t *testing.T) {
 	assert.That("123").Not().IsEmpty()
 	assert.That(map[int]string{0: ""}).Not().IsEmpty()
 
-	// Incompatible types (these will be treated with feature #2)
-	assert.That(666).Not().IsEmpty()
-	assert.That(struct{}{}).Not().IsEmpty()
-	assert.That(false).Not().IsEmpty()
-
 	// Then nothing
 }
 
@@ -44,11 +39,6 @@ func Test_HasLen_should_pass(t *testing.T) {
 	assert.That([]string{"", ""}).Not().HasLen(3)
 	assert.That("abcd").Not().HasLen(3)
 	assert.That(map[int]string{0: ""}).Not().HasLen(3)
-
-	// Incompatible types
-	assert.That(666).Not().HasLen(3)
-	assert.That(struct{}{}).Not().HasLen(3)
-	assert.That(false).Not().HasLen(3)
 
 	// Then nothing
 }
@@ -67,11 +57,6 @@ func Test_HasMaxLen_should_pass(t *testing.T) {
 	assert.That("abcd").Not().HasMaxLen(3)
 	assert.That(map[int]string{0: "", 1: "", 2: "", 3: "abc"}).Not().HasMaxLen(3)
 
-	// Incompatible types
-	assert.That(666).Not().HasMaxLen(3)
-	assert.That(struct{}{}).Not().HasMaxLen(3)
-	assert.That(false).Not().HasMaxLen(3)
-
 	// Then nothing
 }
 
@@ -88,11 +73,6 @@ func Test_HasMinLen_should_pass(t *testing.T) {
 	assert.That([]string{"", ""}).Not().HasMinLen(3)
 	assert.That("ab").Not().HasMinLen(3)
 	assert.That(map[int]string{}).Not().HasMinLen(3)
-
-	// Incompatible types
-	assert.That(666).Not().HasMinLen(3)
-	assert.That(struct{}{}).Not().HasMinLen(3)
-	assert.That(false).Not().HasMinLen(3)
 
 	// Then nothing
 }
@@ -141,11 +121,6 @@ func Test_Length_Matchers_should_fail(t *testing.T) {
 			assertFunc: func(assert assertion.Assert) { assert.That([]string{""}).Not().HasMaxLen(2) },
 			errLog:     fmt.Sprintf("\nValue length should not be lower than : %d. \n Actual value : %d", 2, 1),
 		},
-
-		{
-			assertFunc: func(assert assertion.Assert) { assert.That(123).IsEmpty() },
-			errLog:     "\nValue type should be Array, Slice, String or Map",
-		},
 	}
 
 	for _, entry := range testEntries {
@@ -156,6 +131,50 @@ func Test_Length_Matchers_should_fail(t *testing.T) {
 		// Expectation
 		tMock.EXPECT().Helper().AnyTimes()
 		tMock.EXPECT().Error(entry.errLog)
+
+		// When
+		entry.assertFunc(assert)
+	}
+}
+
+func Test_Length_Matchers_should_fail_with_error(t *testing.T) {
+	// Mock preparation
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	testEntries := []struct {
+		assertFunc func(assert assertion.Assert)
+		err        error
+		times      int
+	}{
+		{
+			assertFunc: func(assert assertion.Assert) {
+				assert.That(666).Not().IsEmpty()
+				assert.That(struct{}{}).Not().IsEmpty()
+				assert.That(false).Not().IsEmpty()
+				assert.That(666).Not().HasLen(3)
+				assert.That(struct{}{}).Not().HasLen(3)
+				assert.That(false).Not().HasLen(3)
+				assert.That(666).Not().HasMaxLen(3)
+				assert.That(struct{}{}).Not().HasMaxLen(3)
+				assert.That(false).Not().HasMaxLen(3)
+				assert.That(666).Not().HasMinLen(3)
+				assert.That(struct{}{}).Not().HasMinLen(3)
+				assert.That(false).Not().HasMinLen(3)
+			},
+			err:   assertion.ErrNotOfLenType,
+			times: 12,
+		},
+	}
+
+	for _, entry := range testEntries {
+		// Given
+		tMock := mocks.NewMockPublicTB(ctrl)
+		assert := assertion.New(tMock)
+
+		// Expectation
+		tMock.EXPECT().Helper().AnyTimes()
+		tMock.EXPECT().Fatalf("\n%s", entry.err.Error()).Times(entry.times)
 
 		// When
 		entry.assertFunc(assert)

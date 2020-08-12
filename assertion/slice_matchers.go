@@ -6,7 +6,7 @@ import (
 )
 
 func Contains(e interface{}) Matcher {
-	return func(v interface{}) MatchResult {
+	return func(v interface{}) (MatchResult, error) {
 		switch reflect.TypeOf(v).Kind() {
 		case reflect.Slice:
 			s := reflect.ValueOf(v)
@@ -20,7 +20,7 @@ func Contains(e interface{}) Matcher {
 			return falsy(fmt.Sprintf("\nValue should contains element : %v", e))
 
 		default:
-			return falsy("\nValue should be a slice")
+			return errored(ErrNotOfSliceType)
 		}
 	}
 }

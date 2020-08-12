@@ -6,7 +6,7 @@ import (
 )
 
 func ContainsValue(e interface{}) Matcher {
-	return func(v interface{}) MatchResult {
+	return func(v interface{}) (MatchResult, error) {
 		switch reflect.TypeOf(v).Kind() {
 		case reflect.Map:
 			vm := reflect.ValueOf(v)
@@ -20,13 +20,13 @@ func ContainsValue(e interface{}) Matcher {
 			return falsy(fmt.Sprintf("\nValue should contains element : %v", e))
 
 		default:
-			return falsy("\nValue should be a map")
+			return errored(ErrNotOfMapType)
 		}
 	}
 }
 
 func ContainsKey(e interface{}) Matcher {
-	return func(v interface{}) MatchResult {
+	return func(v interface{}) (MatchResult, error) {
 		switch reflect.TypeOf(v).Kind() {
 		case reflect.Map:
 			vm := reflect.ValueOf(v)
@@ -39,7 +39,7 @@ func ContainsKey(e interface{}) Matcher {
 			return falsy(fmt.Sprintf("\nValue should contains key : %v", e))
 
 		default:
-			return falsy("\nValue should be a map")
+			return errored(ErrNotOfMapType)
 		}
 	}
 }
