@@ -18,11 +18,11 @@ func MatchRe(reg string) Matcher {
 	return func(v interface{}) (MatchResult, error) {
 		s, ok := v.(string)
 		if !ok {
-			return falsy(fmt.Sprintf("\nValue type is not a string : %v", v))
+			return errored(ErrNotOfStringType)
 		}
 		match, err := regexp.Match(reg, []byte(s))
 		if err != nil {
-			return falsy(fmt.Sprintf("\nCannot match for regexp : %s", reg))
+			return errored(err)
 		}
 		if match {
 			return truthy(fmt.Sprintf("\nValue should not match regexp : %s", reg))

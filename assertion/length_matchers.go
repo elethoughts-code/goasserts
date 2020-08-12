@@ -16,7 +16,7 @@ func lenCondition(cond func(int) bool, logFunc func(int) string, nlogFunc func(i
 			}
 			return falsy(logFunc(actualLen))
 		default:
-			return falsy("\nValue type should be Array, Slice, String or Map")
+			return errored(ErrNotOfLenType)
 		}
 	}
 }

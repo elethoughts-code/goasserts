@@ -17,7 +17,6 @@ func Test_Contains_should_pass(t *testing.T) {
 	assert.That([]string{"a", "b", "c"}).Contains("b")
 	assert.That([]string{"a", "b", "c"}).Not().Contains("d")
 	assert.That([]string{}).Not().Contains("d")
-	assert.That("abcd").Not().Contains("d")
 
 	assert.That([]struct{ a string }{{"a"}, {"b"}, {"c"}}).Contains(struct{ a string }{"b"})
 
@@ -45,10 +44,6 @@ func Test_Slice_Matchers_should_fail(t *testing.T) {
 			assertFunc: func(assert assertion.Assert) { assert.That([]string{}).Contains("b") },
 			errLog:     "\nValue should contains element : b",
 		},
-		{
-			assertFunc: func(assert assertion.Assert) { assert.That("abc").Contains("b") },
-			errLog:     "\nValue should be a slice",
-		},
 	}
 
 	for _, entry := range testEntries {
@@ -59,6 +54,40 @@ func Test_Slice_Matchers_should_fail(t *testing.T) {
 		// Expectation
 		tMock.EXPECT().Helper().AnyTimes()
 		tMock.EXPECT().Error(entry.errLog)
+
+		// When
+		entry.assertFunc(assert)
+	}
+}
+
+func Test_Slice_Matchers_should_fail_with_error(t *testing.T) {
+	// Mock preparation
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	testEntries := []struct {
+		assertFunc func(assert assertion.Assert)
+		err        error
+		times      int
+	}{
+		{
+			assertFunc: func(assert assertion.Assert) {
+				assert.That("abcd").Contains("d")
+				assert.That("abcd").Not().Contains("d")
+			},
+			err:   assertion.ErrNotOfSliceType,
+			times: 2,
+		},
+	}
+
+	for _, entry := range testEntries {
+		// Given
+		tMock := mocks.NewMockPublicTB(ctrl)
+		assert := assertion.New(tMock)
+
+		// Expectation
+		tMock.EXPECT().Helper().AnyTimes()
+		tMock.EXPECT().Fatalf("\n%s", entry.err.Error()).Times(entry.times)
 
 		// When
 		entry.assertFunc(assert)

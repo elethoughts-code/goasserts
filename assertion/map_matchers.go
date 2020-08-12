@@ -20,7 +20,7 @@ func ContainsValue(e interface{}) Matcher {
 			return falsy(fmt.Sprintf("\nValue should contains element : %v", e))
 
 		default:
-			return falsy("\nValue should be a map")
+			return errored(ErrNotOfMapType)
 		}
 	}
 }
@@ -39,7 +39,7 @@ func ContainsKey(e interface{}) Matcher {
 			return falsy(fmt.Sprintf("\nValue should contains key : %v", e))
 
 		default:
-			return falsy("\nValue should be a map")
+			return errored(ErrNotOfMapType)
 		}
 	}
 }
