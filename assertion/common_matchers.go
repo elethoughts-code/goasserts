@@ -12,26 +12,32 @@ type MatchResult struct {
 	NLog    string
 }
 
-func truthy(nlog string) MatchResult {
+var zeroMatchResult = MatchResult{}
+
+func errored(err error) (MatchResult, error) {
+	return zeroMatchResult, err
+}
+
+func truthy(nlog string) (MatchResult, error) {
 	return MatchResult{
 		Matches: true,
 		Log:     "",
 		NLog:    nlog,
-	}
+	}, nil
 }
 
-func falsy(log string) MatchResult {
+func falsy(log string) (MatchResult, error) {
 	return MatchResult{
 		Matches: false,
 		Log:     log,
 		NLog:    "",
-	}
+	}, nil
 }
 
-type Matcher func(v interface{}) MatchResult
+type Matcher func(v interface{}) (MatchResult, error)
 
 func IsEq(e interface{}) Matcher {
-	return func(v interface{}) MatchResult {
+	return func(v interface{}) (MatchResult, error) {
 		if e == v {
 			return truthy(fmt.Sprintf("\nValue should not be equal to : %v", e))
 		}
@@ -40,7 +46,7 @@ func IsEq(e interface{}) Matcher {
 }
 
 func IsNil() Matcher {
-	return func(v interface{}) MatchResult {
+	return func(v interface{}) (MatchResult, error) {
 		if v == nil {
 			return truthy("\nValue should not be nil")
 		}
@@ -49,7 +55,7 @@ func IsNil() Matcher {
 }
 
 func IsDeepEq(e interface{}) Matcher {
-	return func(v interface{}) MatchResult {
+	return func(v interface{}) (MatchResult, error) {
 		if reflect.DeepEqual(v, e) {
 			return truthy(fmt.Sprintf("\nValue should not be deep equal to : %v", e))
 		}
@@ -58,7 +64,7 @@ func IsDeepEq(e interface{}) Matcher {
 }
 
 func HaveKind(k reflect.Kind) Matcher {
-	return func(v interface{}) MatchResult {
+	return func(v interface{}) (MatchResult, error) {
 		vv := reflect.ValueOf(v)
 		if vv.Kind() == k {
 			return truthy(fmt.Sprintf("\nValue should not of Kind : %v", k))
@@ -68,10 +74,10 @@ func HaveKind(k reflect.Kind) Matcher {
 }
 
 func IsError(target error) Matcher {
-	return func(v interface{}) MatchResult {
+	return func(v interface{}) (MatchResult, error) {
 		ve, ok := v.(error)
 		if !ok {
-			return falsy("\nValue is not of type error.")
+			return errored(ErrNotOfErrorType)
 		}
 
 		if errors.Is(ve, target) {
@@ -83,10 +89,10 @@ func IsError(target error) Matcher {
 }
 
 func AsError(target interface{}) Matcher {
-	return func(v interface{}) MatchResult {
+	return func(v interface{}) (MatchResult, error) {
 		ve, ok := v.(error)
 		if !ok {
-			return falsy("\nValue is not of type error.")
+			return errored(ErrNotOfErrorType)
 		}
 
 		if errors.As(ve, target) {

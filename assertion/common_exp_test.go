@@ -138,18 +138,6 @@ func Test_Common_Matchers_should_fail(t *testing.T) {
 		},
 		{
 			assertFunc: func(assert assertion.Assert) {
-				assert.That(123).AsError(&e)
-			},
-			errLog: "\nValue is not of type error.",
-		},
-		{
-			assertFunc: func(assert assertion.Assert) {
-				assert.That(123).IsError(errors.New("My error"))
-			},
-			errLog: "\nValue is not of type error.",
-		},
-		{
-			assertFunc: func(assert assertion.Assert) {
 				err := &myError{}
 				assert.That(err).Not().AsError(&e)
 			},
@@ -183,6 +171,63 @@ func Test_Common_Matchers_should_fail(t *testing.T) {
 		// Expectation
 		tMock.EXPECT().Helper().AnyTimes()
 		tMock.EXPECT().Error(entry.errLog)
+
+		// When
+		entry.assertFunc(assert)
+	}
+}
+
+func Test_Common_Matchers_should_fail_with_error(t *testing.T) {
+	// Mock preparation
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	var e *myError
+
+	testEntries := []struct {
+		assertFunc func(assert assertion.Assert)
+		err        error
+		times      int
+	}{
+		{
+			assertFunc: func(assert assertion.Assert) {
+				assert.That(123).AsError(&e)
+				assert.That(123).IsError(errors.New("My error"))
+				assert.That(123).Not().AsError(&e)
+				assert.That(123).Not().IsError(errors.New("My error"))
+			},
+			err:   assertion.ErrNotOfErrorType,
+			times: 4,
+		},
+		{
+			assertFunc: func(assert assertion.Assert) {
+				assert.That([]string{}).IsEq([]string{})
+				assert.That([]string{}).Not().IsEq([]string{})
+			},
+			err:   errors.New("[panic error occurred] runtime error: comparing uncomparable type []string"),
+			times: 2,
+		},
+		{
+			assertFunc: func(assert assertion.Assert) {
+				assert.That([]string{}).Matches(func(v interface{}) (assertion.MatchResult, error) {
+					panic("for some reason")
+				})
+				assert.That([]string{}).Not().Matches(func(v interface{}) (assertion.MatchResult, error) {
+					panic("for some reason")
+				})
+			},
+			err:   errors.New("[panic error occurred] for some reason"),
+			times: 2,
+		},
+	}
+
+	for _, entry := range testEntries {
+		// Given
+		tMock := mocks.NewMockPublicTB(ctrl)
+		assert := assertion.New(tMock)
+
+		// Expectation
+		tMock.EXPECT().Helper().AnyTimes()
+		tMock.EXPECT().Fatalf("\n%s", entry.err.Error()).Times(entry.times)
 
 		// When
 		entry.assertFunc(assert)

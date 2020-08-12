@@ -90,9 +90,27 @@ func (exp *expectation) handleFailure() {
 	}
 }
 
+func runMatcher(m Matcher, v interface{}) (mr MatchResult, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			if e, ok := r.(error); ok {
+				err = fmt.Errorf("[panic error occurred] %w", e)
+			} else {
+				err = fmt.Errorf("[panic error occurred] %v", r)
+			}
+		}
+	}()
+	mr, err = m(v)
+	return mr, err
+}
+
 func (exp *expectation) Matches(m Matcher) {
 	exp.t.Helper()
-	mr := m(exp.v)
+	mr, err := runMatcher(m, exp.v)
+	if err != nil {
+		exp.t.Fatalf("\n%s", err.Error())
+		return
+	}
 	fail := exp.negation == mr.Matches
 	if fail {
 		if exp.log == "" && exp.negation {

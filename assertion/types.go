@@ -1,5 +1,7 @@
 package assertion
 
+import "errors"
+
 type PublicTB interface {
 	Cleanup(func())
 	Error(args ...interface{})
@@ -18,3 +20,5 @@ type PublicTB interface {
 	Skipf(format string, args ...interface{})
 	Skipped() bool
 }
+
+var ErrNotOfErrorType = errors.New("value is not of type error")

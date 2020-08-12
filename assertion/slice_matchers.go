@@ -6,7 +6,7 @@ import (
 )
 
 func Contains(e interface{}) Matcher {
-	return func(v interface{}) MatchResult {
+	return func(v interface{}) (MatchResult, error) {
 		switch reflect.TypeOf(v).Kind() {
 		case reflect.Slice:
 			s := reflect.ValueOf(v)

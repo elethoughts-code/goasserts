@@ -6,7 +6,7 @@ import (
 )
 
 func lenCondition(cond func(int) bool, logFunc func(int) string, nlogFunc func(int) string) Matcher {
-	return func(v interface{}) MatchResult {
+	return func(v interface{}) (MatchResult, error) {
 		vv := reflect.ValueOf(v)
 		switch vv.Kind() {
 		case reflect.Array, reflect.String, reflect.Slice, reflect.Map:
