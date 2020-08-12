@@ -71,7 +71,7 @@ func IsError(target error) Matcher {
 	return func(v interface{}) MatchResult {
 		ve, ok := v.(error)
 		if !ok {
-			return falsy(fmt.Sprintf("\nValue is not of type error."))
+			return falsy("\nValue is not of type error.")
 		}
 
 		if errors.Is(ve, target) {

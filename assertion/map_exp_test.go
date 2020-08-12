@@ -23,7 +23,6 @@ func Test_ContainsValue_should_pass(t *testing.T) {
 	assert.That(map[int]struct{ a string }{0: {"a"}, 1: {"b"}, 2: {"c"}}).ContainsValue(struct{ a string }{"b"})
 
 	// Then nothing
-
 }
 
 func Test_ContainsKey_should_pass(t *testing.T) {
@@ -41,7 +40,6 @@ func Test_ContainsKey_should_pass(t *testing.T) {
 	assert.That(map[struct{ a string }]int{{"a"}: 0, {"b"}: 1, {"c"}: 2}).ContainsKey(struct{ a string }{"b"})
 
 	// Then nothing
-
 }
 
 func Test_Map_Matchers_should_fail(t *testing.T) {
