@@ -17,6 +17,8 @@ type Expectation interface {
 	CommonExpectation
 	LengthExpectation
 	StringExpectation
+	SliceExpectation
+	MapExpectation
 }
 
 type assert struct {
