@@ -7,10 +7,10 @@ import (
 
 type Diff struct {
 	Path  []string
-	Value interface{}
+	Value error
 }
 
-func newDiff(path []string, value interface{}) Diff {
+func newDiff(path []string, value error) Diff {
 	cPath := make([]string, len(path))
 	copy(cPath, path)
 	return Diff{
@@ -24,23 +24,48 @@ type CommonDiff struct {
 	B interface{}
 }
 
+func (cd CommonDiff) Error() string {
+	return fmt.Sprintf("values diff\nA=%v\nB=%v", cd.A, cd.B)
+}
+
 type TypeDiff CommonDiff
 
+func (td TypeDiff) Error() string {
+	return fmt.Sprintf("value types diff\nType of A=%v\nType of B=%v", reflect.TypeOf(td.A), reflect.TypeOf(td.B))
+}
+
 type FuncDiff CommonDiff
+
+func (fd FuncDiff) Error() string {
+	return "functions cannot be compared"
+}
 
 type LenDiff struct {
 	CommonDiff
 	Value int
 }
 
+func (ld LenDiff) Error() string {
+	return fmt.Sprintf("value length diff = %v", ld.Value)
+}
+
 type KeyNotFoundDiff struct {
-	A bool
-	B bool
+	Key string
+	A   bool
+	B   bool
+}
+
+func (kd KeyNotFoundDiff) Error() string {
+	return fmt.Sprintf("key [%s] not found", kd.Key)
 }
 
 type InvalidDiff struct {
 	A bool
 	B bool
+}
+
+func (id InvalidDiff) Error() string {
+	return "invalid value"
 }
 
 func Diffs(a, b interface{}) (diffs []Diff) {
@@ -180,7 +205,8 @@ func checkMaps(currentPath []string, va, vb reflect.Value, diffs *[]Diff, visite
 		fieldName := fmt.Sprintf("[%v]", k)
 		bValue := vb.MapIndex(k)
 		if !bValue.IsValid() || bValue.IsZero() {
-			*diffs = append(*diffs, newDiff(append(currentPath, fieldName), KeyNotFoundDiff{A: true, B: false}))
+			*diffs = append(*diffs, newDiff(append(currentPath, fieldName),
+				KeyNotFoundDiff{Key: fmt.Sprintf("%v", k), A: true, B: false}))
 		} else {
 			findDiffs(append(currentPath, fieldName), va.MapIndex(k), bValue, diffs, visited)
 		}
@@ -189,7 +215,8 @@ func checkMaps(currentPath []string, va, vb reflect.Value, diffs *[]Diff, visite
 		fieldName := fmt.Sprintf("[%v]", k)
 		aValue := va.MapIndex(k)
 		if !aValue.IsValid() || aValue.IsZero() {
-			*diffs = append(*diffs, newDiff(append(currentPath, fieldName), KeyNotFoundDiff{A: false, B: true}))
+			*diffs = append(*diffs, newDiff(append(currentPath, fieldName),
+				KeyNotFoundDiff{Key: fmt.Sprintf("%v", k), A: false, B: true}))
 		}
 	}
 }

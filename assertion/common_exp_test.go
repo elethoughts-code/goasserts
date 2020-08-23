@@ -45,8 +45,8 @@ type myError struct {
 	wrapped error
 }
 
-func (me *myError) Error() string { return me.msg }
-func (me *myError) Unwrap() error { return me.wrapped }
+func (myError *myError) Error() string { return myError.msg }
+func (myError *myError) Unwrap() error { return myError.wrapped }
 
 func Test_IsError_should_pass(t *testing.T) {
 	// Given
@@ -56,7 +56,7 @@ func Test_IsError_should_pass(t *testing.T) {
 	err2 := fmt.Errorf("some other error > %w", err1)
 
 	err3 := &myError{
-		msg:     "My error",
+		msg:     "my error",
 		wrapped: err2,
 	}
 
@@ -71,7 +71,7 @@ func Test_IsError_should_pass(t *testing.T) {
 
 	assert.That(err1).Not().IsError(err2)
 	assert.That(err2).Not().IsError(err3)
-	assert.That(err3).Not().IsError(fmt.Errorf("Error 4"))
+	assert.That(err3).Not().IsError(fmt.Errorf("error 4"))
 
 	// Then nothing
 }
@@ -84,7 +84,7 @@ func Test_AsError_should_pass(t *testing.T) {
 	err2 := fmt.Errorf("some other error > %w", err1)
 
 	err3 := &myError{
-		msg:     "My error",
+		msg:     "my error",
 		wrapped: err2,
 	}
 
@@ -146,20 +146,20 @@ func Test_Common_Matchers_should_fail(t *testing.T) {
 
 		{
 			assertFunc: func(assert assertion.Assert) {
-				assert.That(errors.New("Error 1")).IsError(errors.New("Error 2"))
+				assert.That(errors.New("error 1")).IsError(errors.New("error 2"))
 			},
 			errLog: fmt.Sprintf("\nError Value is not of the expected type.\nExpected : %v\nGot : %v",
-				errors.New("Error 2"),
-				errors.New("Error 1")),
+				errors.New("error 2"),
+				errors.New("error 1")),
 		},
 
 		{
 			assertFunc: func(assert assertion.Assert) {
-				err1 := errors.New("Error 1")
+				err1 := errors.New("error 1")
 				err2 := fmt.Errorf("%w", err1)
 				assert.That(err2).Not().IsError(err1)
 			},
-			errLog: fmt.Sprintf("\nError value should not be : %v", errors.New("Error 1")),
+			errLog: fmt.Sprintf("\nError value should not be : %v", errors.New("error 1")),
 		},
 	}
 
@@ -191,9 +191,9 @@ func Test_Common_Matchers_should_fail_with_error(t *testing.T) {
 		{
 			assertFunc: func(assert assertion.Assert) {
 				assert.That(123).AsError(&e)
-				assert.That(123).IsError(errors.New("My error"))
+				assert.That(123).IsError(errors.New("my error"))
 				assert.That(123).Not().AsError(&e)
-				assert.That(123).Not().IsError(errors.New("My error"))
+				assert.That(123).Not().IsError(errors.New("my error"))
 			},
 			err:   assertion.ErrNotOfErrorType,
 			times: 4,
@@ -232,4 +232,155 @@ func Test_Common_Matchers_should_fail_with_error(t *testing.T) {
 		// When
 		entry.assertFunc(assert)
 	}
+}
+
+type SampleStruct struct {
+	A int
+	B string
+	C OtherStruct
+	D *OtherStruct
+}
+
+type OtherStruct struct {
+	A []OtherStruct
+	B map[string][]int
+	C interface{}
+	D uint8
+	E bool
+}
+
+func Test_NoDiff_should_pass(t *testing.T) {
+	// Given
+	assert := assertion.New(t)
+	os := OtherStruct{D: 0, E: true}
+	os2 := OtherStruct{D: 0, E: true}
+	a := SampleStruct{
+		A: 1,
+		B: "b1",
+		C: OtherStruct{
+			A: []OtherStruct{{D: 1}, {D: 2}, {D: 3}},
+			B: nil,
+			C: nil,
+			D: 0,
+			E: false,
+		},
+		D: &os,
+	}
+	b := SampleStruct{
+		A: 1,
+		B: "b1",
+		C: OtherStruct{
+			A: []OtherStruct{{D: 1}, {D: 2}, {D: 3}},
+			B: nil,
+			C: nil,
+			D: 0,
+			E: false,
+		},
+		D: &os,
+	}
+	c := SampleStruct{
+		A: 2,
+		B: "b2",
+		C: OtherStruct{
+			A: []OtherStruct{{D: 1}, {D: 2}, {D: 4}},
+			B: nil,
+			C: nil,
+			D: 0,
+			E: false,
+		},
+		D: &os2,
+	}
+	// When
+	assert.That(a).NoDiff(b)
+	assert.That(a).Not().NoDiff(c)
+}
+
+func Test_NoDiff_should_not_pass_1(t *testing.T) {
+	// Given
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	os := OtherStruct{D: 0, E: true}
+	a := SampleStruct{
+		A: 1,
+		B: "b1",
+		C: OtherStruct{
+			A: []OtherStruct{{D: 1}, {D: 2}, {D: 3}},
+			B: nil,
+			C: nil,
+			D: 0,
+			E: false,
+		},
+		D: &os,
+	}
+	b := SampleStruct{
+		A: 1,
+		B: "b1",
+		C: OtherStruct{
+			A: []OtherStruct{{D: 1}, {D: 2}, {D: 3}},
+			B: nil,
+			C: nil,
+			D: 0,
+			E: false,
+		},
+		D: &os,
+	}
+
+	// Expectation
+	tMock := mocks.NewMockPublicTB(ctrl)
+	assert := assertion.New(tMock)
+	tMock.EXPECT().Helper().AnyTimes()
+	tMock.EXPECT().Error("Value should have diffs with expectation")
+
+	// When
+	assert.That(a).Not().NoDiff(b)
+}
+
+func Test_NoDiff_should_not_pass_2(t *testing.T) {
+	// Given
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	os := OtherStruct{D: 0, E: true}
+	os2 := OtherStruct{D: 0, E: true}
+	a := SampleStruct{
+		A: 1,
+		B: "b1",
+		C: OtherStruct{
+			A: []OtherStruct{{D: 1}, {D: 2}, {D: 3}},
+			B: nil,
+			C: nil,
+			D: 0,
+			E: false,
+		},
+		D: &os,
+	}
+	b := SampleStruct{
+		A: 2,
+		B: "b2",
+		C: OtherStruct{
+			A: []OtherStruct{{D: 1}, {D: 2}, {D: 4}},
+			B: nil,
+			C: nil,
+			D: 0,
+			E: false,
+		},
+		D: &os2,
+	}
+
+	// Expectation
+	tMock := mocks.NewMockPublicTB(ctrl)
+	assert := assertion.New(tMock)
+	tMock.EXPECT().Helper().AnyTimes()
+	tMock.EXPECT().Error("Value have following diffs with expectation :\n" +
+		"Path [[A]] : values diff\n" +
+		"A=1\n" +
+		"B=2\n" +
+		"Path [[B]] : values diff\n" +
+		"A=b1\n" +
+		"B=b2\n" +
+		"Path [[C] [A] [2] [D]] : values diff\n" +
+		"A=3\n" +
+		"B=4")
+
+	// When
+	assert.That(a).NoDiff(b)
 }

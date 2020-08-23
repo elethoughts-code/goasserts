@@ -1,19 +1,30 @@
 package diff_test
 
 import (
-	"github.com/elethoughts-code/goasserts/assertion"
-
+	"errors"
+	"reflect"
 	"testing"
 	"unsafe"
 
 	"github.com/elethoughts-code/goasserts/diff"
 )
 
+func Test_simple_one_level_differences_functions(t *testing.T) {
+	// Given
+
+	// When
+	d := diff.Diffs(func() {}, func() {})
+
+	// Then
+	if !errors.As(d[0].Value, &diff.FuncDiff{}) || d[0].Value.Error() != "functions cannot be compared" {
+		t.Fail()
+	}
+}
+
 func Test_simple_one_level_differences(t *testing.T) {
 	// Given
-	assert := assertion.New(t)
 
-	rootLevelDiffs := func(values ...interface{}) []diff.Diff {
+	rootLevelDiffs := func(values ...error) []diff.Diff {
 		diffs := make([]diff.Diff, len(values))
 		for i, v := range values {
 			diffs[i] = diff.Diff{
@@ -119,7 +130,9 @@ func Test_simple_one_level_differences(t *testing.T) {
 		// When
 		d := diff.Diffs(tc.a, tc.b)
 		// Then
-		assert.That(d).IsDeepEq(tc.result)
+		if !reflect.DeepEqual(d, tc.result) {
+			t.Fail()
+		}
 	}
 }
 
@@ -139,11 +152,9 @@ type OtherStruct struct {
 }
 
 func Test_simple_second_level_differences(t *testing.T) {
-	assert := assertion.New(t)
-
 	path := func(p ...string) []string { return p }
 	diffs := func(d ...diff.Diff) []diff.Diff { return d }
-	d := func(path []string, value interface{}) diff.Diff {
+	d := func(path []string, value error) diff.Diff {
 		return diff.Diff{
 			Path:  path,
 			Value: value,
@@ -173,8 +184,8 @@ func Test_simple_second_level_differences(t *testing.T) {
 			a: map[string]int{"a": 1, "b": 2},
 			b: map[string]int{"a": 1, "c": 2},
 			result: diffs(
-				d(path("[b]"), diff.KeyNotFoundDiff{A: true, B: false}),
-				d(path("[c]"), diff.KeyNotFoundDiff{A: false, B: true}),
+				d(path("[b]"), diff.KeyNotFoundDiff{Key: "b", A: true, B: false}),
+				d(path("[c]"), diff.KeyNotFoundDiff{Key: "c", A: false, B: true}),
 			),
 		},
 		{
@@ -190,16 +201,16 @@ func Test_simple_second_level_differences(t *testing.T) {
 		// When
 		d := diff.Diffs(tc.a, tc.b)
 		// Then
-		assert.That(d).IsDeepEq(tc.result)
+		if !reflect.DeepEqual(d, tc.result) {
+			t.Fail()
+		}
 	}
 }
 
 func Test_multi_level_differences(t *testing.T) {
-	assert := assertion.New(t)
-
 	path := func(p ...string) []string { return p }
 	diffs := func(d ...diff.Diff) []diff.Diff { return d }
-	d := func(path []string, value interface{}) diff.Diff {
+	d := func(path []string, value error) diff.Diff {
 		return diff.Diff{
 			Path:  path,
 			Value: value,
@@ -303,6 +314,48 @@ func Test_multi_level_differences(t *testing.T) {
 		// When
 		d := diff.Diffs(tc.a, tc.b)
 		// Then
-		assert.That(d).IsDeepEq(tc.result)
+		if !reflect.DeepEqual(d, tc.result) {
+			t.Fail()
+		}
+	}
+}
+
+func Test_error_messages(t *testing.T) {
+	// Given
+
+	testEntries := []struct {
+		e   error
+		msg string
+	}{
+		{
+			e:   diff.CommonDiff{A: 1, B: 2},
+			msg: "values diff\nA=1\nB=2",
+		},
+		{
+			e:   diff.TypeDiff{A: 1, B: ""},
+			msg: "value types diff\nType of A=int\nType of B=string",
+		},
+		{
+			e:   diff.FuncDiff{A: func() {}, B: func() {}},
+			msg: "functions cannot be compared",
+		},
+		{
+			e:   diff.LenDiff{CommonDiff: diff.CommonDiff{}, Value: 2},
+			msg: "value length diff = 2",
+		},
+		{
+			e:   diff.KeyNotFoundDiff{Key: "MyKey", A: true, B: false},
+			msg: "key [MyKey] not found",
+		},
+		{
+			e:   diff.InvalidDiff{A: true, B: false},
+			msg: "invalid value",
+		},
+	}
+
+	for _, entry := range testEntries {
+		if entry.e.Error() != entry.msg {
+			t.Fail()
+		}
 	}
 }

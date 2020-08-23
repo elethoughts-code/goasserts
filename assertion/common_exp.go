@@ -6,6 +6,7 @@ type CommonExpectation interface {
 	Matches(m Matcher)
 	IsEq(e interface{})
 	IsDeepEq(e interface{})
+	NoDiff(e interface{})
 	IsNil()
 	HaveKind(k reflect.Kind)
 	IsError(target error)
@@ -20,6 +21,11 @@ func (exp *expectation) IsEq(e interface{}) {
 func (exp *expectation) IsDeepEq(e interface{}) {
 	exp.t.Helper()
 	exp.Matches(IsDeepEq(e))
+}
+
+func (exp *expectation) NoDiff(e interface{}) {
+	exp.t.Helper()
+	exp.Matches(NoDiff(e))
 }
 
 func (exp *expectation) IsNil() {

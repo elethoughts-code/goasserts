@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"reflect"
+
+	"github.com/elethoughts-code/goasserts/diff"
 )
 
 type MatchResult struct {
@@ -60,6 +62,20 @@ func IsDeepEq(e interface{}) Matcher {
 			return truthy(fmt.Sprintf("\nValue should not be deep equal to : %v", e))
 		}
 		return falsy(fmt.Sprintf("\nValue is not deep equal to expectation.\nExpected : %v\nGot : %v", e, v))
+	}
+}
+
+func NoDiff(e interface{}) Matcher {
+	return func(v interface{}) (MatchResult, error) {
+		diffs := diff.Diffs(v, e)
+		if len(diffs) == 0 {
+			return truthy("Value should have diffs with expectation")
+		}
+		falsyMsg := "Value have following diffs with expectation :"
+		for _, d := range diffs {
+			falsyMsg += fmt.Sprintf("\nPath %v : %v", d.Path, d.Value)
+		}
+		return falsy(falsyMsg)
 	}
 }
 
