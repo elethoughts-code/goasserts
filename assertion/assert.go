@@ -14,6 +14,7 @@ type Expectation interface {
 	Silent() Expectation
 	Logf(format string, args ...interface{}) Expectation
 	Log(log string) Expectation
+	MapTransformer
 	CommonExpectation
 	LengthExpectation
 	StringExpectation
