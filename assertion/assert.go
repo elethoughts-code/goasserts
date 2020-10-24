@@ -104,7 +104,7 @@ func runMatcher(m Matcher, v interface{}) (mr MatchResult, err error) {
 			if e, ok := r.(error); ok {
 				err = fmt.Errorf("[panic error occurred] %w", e)
 			} else {
-				err = fmt.Errorf("[panic error occurred] %v", r)
+				err = fmt.Errorf("[panic error occurred] %v", r) //nolint:goerr113
 			}
 		}
 	}()

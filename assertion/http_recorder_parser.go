@@ -67,7 +67,7 @@ func (exp *expectation) Response() Expectation {
 	if !ok {
 		panic(ErrNotOfResponseRecorderType)
 	}
-	exp.v = recorder.Result()
+	exp.v = recorder.Result() //nolint: bodyclose
 	return exp
 }
 

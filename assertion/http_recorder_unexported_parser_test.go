@@ -1,4 +1,4 @@
-package assertion
+package assertion //nolint: testpackage
 
 import (
 	"bytes"
