@@ -20,10 +20,12 @@ type Expectation interface {
 	StringExpectation
 	SliceExpectation
 	MapExpectation
+	HTTPRecorderParser
 }
 
 type assert struct {
-	t PublicTB
+	t  PublicTB
+	br bytesReader
 }
 
 type expectation struct {
@@ -47,8 +49,13 @@ func (a *assert) That(v interface{}) Expectation {
 }
 
 func New(t PublicTB) Assert {
+	return newWithBr(t, stdBytesReader{})
+}
+
+func newWithBr(t PublicTB, br bytesReader) Assert {
 	return &assert{
-		t: t,
+		t:  t,
+		br: br,
 	}
 }
 

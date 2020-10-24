@@ -14,10 +14,8 @@ type MatchResult struct {
 	NLog    string
 }
 
-var zeroMatchResult = MatchResult{}
-
 func errored(err error) (MatchResult, error) {
-	return zeroMatchResult, err
+	return MatchResult{}, err
 }
 
 func truthy(nlog string) (MatchResult, error) {

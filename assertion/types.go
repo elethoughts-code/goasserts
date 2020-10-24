@@ -1,6 +1,10 @@
 package assertion
 
-import "errors"
+import (
+	"errors"
+	"io"
+	"io/ioutil"
+)
 
 type PublicTB interface {
 	Cleanup(func())
@@ -21,6 +25,17 @@ type PublicTB interface {
 	Skipped() bool
 }
 
+type bytesReader interface {
+	ReadAll(r io.Reader) ([]byte, error)
+}
+
+type stdBytesReader struct{}
+
+func (br stdBytesReader) ReadAll(r io.Reader) ([]byte, error) {
+	return ioutil.ReadAll(r)
+}
+
+var ErrNotOfResponseRecorderType = errors.New("value is not of type *httptest.ResponseRecorder")
 var ErrNotOfErrorType = errors.New("value is not of type error")
 var ErrNotOfLenType = errors.New("value type should be Array, Slice, String or Map")
 var ErrNotOfSliceType = errors.New("value should be a slice")
