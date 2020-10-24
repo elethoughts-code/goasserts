@@ -21,6 +21,7 @@ type Expectation interface {
 	SliceExpectation
 	MapExpectation
 	HTTPRecorderParser
+	AttributeParser
 }
 
 type assert struct {

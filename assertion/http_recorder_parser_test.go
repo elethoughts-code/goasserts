@@ -150,6 +150,7 @@ func Test_Multiple_Http_record_transformation_passes(t *testing.T) {
 	assert.That(w).Headers().HasLen(2)
 	assert.That(w).Cookies().HasLen(1)
 	assert.That(w).Header("X-SOME-HEADER").IsEq("123456")
-	assert.That(w).Cookie("my-cookie").Not().IsNil()
+	assert.That(w).Cookie("my-cookie").Attr("Name").IsEq("my-cookie")
+	assert.That(w).Cookie("my-cookie").Attr("Value").IsEq("654321")
 	assert.That(w).Cookie("my-cookie-2").IsNil()
 }
