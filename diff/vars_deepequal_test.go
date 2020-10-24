@@ -55,7 +55,7 @@ var deepEqualTests = []DeepEqualTest{
 	{map[int]string{1: "one", 2: "two"}, map[int]string{2: "two", 1: "one"}, true},
 	{fn1, fn2, true},
 
-	//Inequalities
+	// Inequalities
 	{1, 2, false},
 	{int32(1), int32(2), false},
 	{0.5, 0.6, false},

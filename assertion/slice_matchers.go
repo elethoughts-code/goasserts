@@ -68,3 +68,52 @@ func Unordered(e interface{}) Matcher {
 		return truthy(fmt.Sprintf("\nValue should not contain all elements : %v", e))
 	}
 }
+
+func applyMatcherToAllElements(v interface{}, matcher Matcher) (int, []int, []int, error) {
+	iv, isSlice := toSlice(v)
+	if !isSlice {
+		return 0, nil, nil, ErrNotOfSliceType
+	}
+	truthyIndex := make([]int, 0)
+	falsyIndex := make([]int, 0)
+	for i, item := range iv {
+		mr, err := matcher(item)
+		if err != nil {
+			return 0, nil, nil, err
+		}
+		if mr.Matches {
+			truthyIndex = append(truthyIndex, i)
+		} else {
+			falsyIndex = append(falsyIndex, i)
+		}
+	}
+	return len(iv), truthyIndex, falsyIndex, nil
+}
+
+func All(matcher Matcher) Matcher {
+	return func(v interface{}) (MatchResult, error) {
+		vLen, truthyIndex, falsyIndex, err := applyMatcherToAllElements(v, matcher)
+		if err != nil {
+			return MatchResult{}, err
+		}
+		if len(truthyIndex) != vLen {
+			return falsy(fmt.Sprintf("\nMatcher dont apply to all values. Non matching indexes : %v", falsyIndex))
+		}
+
+		return truthy("\nMatcher should not apply to all elements")
+	}
+}
+
+func AtLeast(n int, matcher Matcher) Matcher {
+	return func(v interface{}) (MatchResult, error) {
+		_, truthyIndex, falsyIndex, err := applyMatcherToAllElements(v, matcher)
+		if err != nil {
+			return MatchResult{}, err
+		}
+		if len(truthyIndex) < n {
+			return falsy(fmt.Sprintf("\nAt least %d element(s) should match. Non matching indexes : %v", n, falsyIndex))
+		}
+
+		return truthy(fmt.Sprintf("\nMatcher should not apply to %d element(s) or more", n))
+	}
+}
