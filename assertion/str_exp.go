@@ -1,5 +1,10 @@
 package assertion
 
+// StringExpectation interface encloses string related expectations.
+//
+// IsBlank() check if the value is a blank string.
+//
+// MatchRe(reg string) applies regex on the value string.
 type StringExpectation interface {
 	IsBlank()
 	MatchRe(reg string)

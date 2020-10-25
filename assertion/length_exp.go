@@ -1,5 +1,15 @@
 package assertion
 
+// LengthExpectation apply on Array, Slice, Map and String values.
+// It adds expectations related to the value length.
+//
+// HasLen(len int) check if the value length is equal to the len parameter.
+//
+// HasMaxLen(len int) check if the value length have not exceeded the len parameter.
+//
+// HasMinLen(len int) check if the value length is greater than the len parameter.
+//
+// IsEmpty() check if the value is empty.
 type LengthExpectation interface {
 	HasLen(len int)
 	HasMaxLen(len int)

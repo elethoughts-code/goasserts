@@ -1,27 +1,49 @@
+// Assertion is handled by two main interfaces that act as a Fluent API.
+//
+// Assert interface for value holding.
+//
+// Expectation interface to apply transformations, expectations, matches. etc on the held value.
+//
 package assertion
 
 import (
 	"fmt"
 )
 
+// Assert is the assertion entry point.
+// It takes a variable as a value and hold it to apply transformations and expectations to it.
+//
+// That should takes a value and return a wrapped Expectation around it.
 type Assert interface {
 	That(v interface{}) Expectation
 }
 
+// Expectation interface have three roles. It changes Expectation state by setting negation, changing
+// expectation result message, etc. It apply transformations on assertion value. It executes expectations.
+//
+// Not() sets current expectation state to negation.
+// thus `assert.That("123").Not().IsNil()` will pass
+// and assert.That(1).Not().IsEq(1) will fail.
+//
+// OrFatal() tell the expectation execution to fail with t.Fatal instead of t.Error.
+//
+// Silent() tell the expectation to fail without logging its message.
+//
+// Logf() and Log() set custom failing message.
 type Expectation interface {
 	Not() Expectation
 	OrFatal() Expectation
 	Silent() Expectation
 	Logf(format string, args ...interface{}) Expectation
 	Log(log string) Expectation
-	MapTransformer
 	CommonExpectation
 	LengthExpectation
 	StringExpectation
 	SliceExpectation
 	MapExpectation
-	HTTPRecorderParser
+	MapTransformer
 	AttributeParser
+	HTTPRecorderParser
 }
 
 type assert struct {
@@ -49,6 +71,7 @@ func (a *assert) That(v interface{}) Expectation {
 	}
 }
 
+// New is an Assert builder. it takes a *testing.T like variable (uses PublicTB interface).
 func New(t PublicTB) Assert {
 	return newWithBr(t, stdBytesReader{})
 }
