@@ -8,11 +8,19 @@ import (
 	"github.com/elethoughts-code/goasserts/diff"
 )
 
+// MatchResult is returned by Matcher based expectations.
+//
+// Log attribute is the straight message to log when match fails
+//
+// NLog attribute is the negation message to log when match succeed but negation attribute is set.
 type MatchResult struct {
 	Matches bool
 	Log     string
 	NLog    string
 }
+
+// Matcher is a function used on related expectations.
+type Matcher func(v interface{}) (MatchResult, error)
 
 func errored(err error) (MatchResult, error) {
 	return MatchResult{}, err
@@ -33,8 +41,6 @@ func falsy(log string) (MatchResult, error) {
 		NLog:    "",
 	}, nil
 }
-
-type Matcher func(v interface{}) (MatchResult, error)
 
 func IsEq(e interface{}) Matcher {
 	return func(v interface{}) (MatchResult, error) {

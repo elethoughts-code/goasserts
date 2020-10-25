@@ -7,6 +7,32 @@ import (
 	"net/http/httptest"
 )
 
+// HTTPRecorderParser interface encloses *httptest.ResponseRecorder value transformations.
+// All transformations return the same expectation interface to pile in calls (Fluent API).
+//
+// Note: all body transformations do not drain the response buffer. Which means that multiple
+// transformations on the same *httptest.ResponseRecorder value can be executed.
+//
+// DecodeBody(decoder func(*bytes.Buffer) (interface{}, error))
+// Changes value to the body using a custom Buffer decoder.
+//
+// BodyToString() Changes value to the body as String.
+//
+// JSONBodyToMap() Changes value to the body as map from JSON decoding.
+//
+// JSONBodyToSlice() Changes value to the body as slice from JSON decoding.
+//
+// Response() Changes value to the response value. (*httptest.ResponseRecorder response attribute)
+//
+// Status() Changes value to the response status code.
+//
+// Headers() Changes value to the response Headers map.
+//
+// Header(header string) Changes value to a specific Header.
+//
+// Cookies() Changes value to the response Cookies slice.
+//
+// Cookie(cookie string) Changes value to a specific Cookie.
 type HTTPRecorderParser interface {
 	BodyToString() Expectation
 	JSONBodyToMap() Expectation

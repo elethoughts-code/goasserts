@@ -2,6 +2,22 @@ package assertion
 
 import "reflect"
 
+// CommonExpectation interface hold commonly used expectations.
+// It also exposes Matches(m Matcher) as a generic expectation method.
+// Nearly all expectations interfaces are shortcuts for Matches(m Matcher).
+//
+// IsEq(e interface{}) expects simple "==" equality.
+//
+// IsDeepEq(e interface{}) expects value and expectation to be deep equal (reflect.DeepEq).
+//
+// IsNil() expects value to be nil.
+//
+// HaveKind(k reflect.Kind) expects value to be of the given reflection Kind.
+//
+// IsError(target error) and AsError(target interface{}) apply errors.IsError and errors.AsError checks/
+//
+// NoDiff(e interface{}) uses  diff.Diffs(v, e) to check equality. When the expectation fails,
+// it log the deltas detected between the value and the expectation.
 type CommonExpectation interface {
 	Matches(m Matcher)
 	IsEq(e interface{})

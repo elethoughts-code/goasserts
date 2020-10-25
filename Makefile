@@ -6,3 +6,6 @@ test:
 
 lint:
 	golangci-lint run -c .golangci.yml ./...
+
+docs:
+	godoc -http=":6660"

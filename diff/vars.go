@@ -5,6 +5,8 @@ import (
 	"reflect"
 )
 
+// Diff is a structure pointing a difference on a variable Path (Deep navigation on attributes and indexes).
+// A difference is reported in the Value attribute as un error.
 type Diff struct {
 	Path  []string
 	Value error
@@ -19,6 +21,7 @@ func newDiff(path []string, value error) Diff {
 	}
 }
 
+// CommonDiff is a simple difference error between two values A and B.
 type CommonDiff struct {
 	A interface{}
 	B interface{}
@@ -28,18 +31,21 @@ func (cd CommonDiff) Error() string {
 	return fmt.Sprintf("values diff\nA=%v\nB=%v", cd.A, cd.B)
 }
 
+// TypeDiff is a type difference error between two values A and B.
 type TypeDiff CommonDiff
 
 func (td TypeDiff) Error() string {
 	return fmt.Sprintf("value types diff\nType of A=%v\nType of B=%v", reflect.TypeOf(td.A), reflect.TypeOf(td.B))
 }
 
+// TypeDiff is a function difference error between two values A and B. (all functions are considered different).
 type FuncDiff CommonDiff
 
 func (fd FuncDiff) Error() string {
 	return "functions cannot be compared"
 }
 
+// LenDiff reports a length different between A and B.
 type LenDiff struct {
 	CommonDiff
 	Value int
@@ -49,6 +55,7 @@ func (ld LenDiff) Error() string {
 	return fmt.Sprintf("value length diff = %v", ld.Value)
 }
 
+// KeyNotFoundDiff reports that a Key exists only on A or B.
 type KeyNotFoundDiff struct {
 	Key string
 	A   bool
@@ -59,6 +66,7 @@ func (kd KeyNotFoundDiff) Error() string {
 	return fmt.Sprintf("key [%s] not found", kd.Key)
 }
 
+// InvalidDiff reports that one or both of the values A and B are in an Invalid State.
 type InvalidDiff struct {
 	A bool
 	B bool
@@ -68,6 +76,8 @@ func (id InvalidDiff) Error() string {
 	return "invalid value"
 }
 
+// Diffs function returns all extracted differences between to variables a and b.
+// It copies most of the standard reflect.DeepEq algorithm (getting around some unexported capabilities).
 func Diffs(a, b interface{}) (diffs []Diff) {
 	diffs = make([]Diff, 0)
 	path := make([]string, 0)

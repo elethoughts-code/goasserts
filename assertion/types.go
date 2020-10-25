@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 )
 
+// PublicTB interface is used to abstract *testing.T variables.
 type PublicTB interface {
 	Cleanup(func())
 	Error(args ...interface{})

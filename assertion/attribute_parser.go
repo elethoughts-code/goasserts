@@ -5,6 +5,14 @@ import (
 	"reflect"
 )
 
+// AttributeParser interface encloses attribute/index access transformations.
+// All transformations return the same expectation interface to pile in calls (Fluent API).
+//
+// Attr(key interface{}) change value to the corresponding attribute.
+// Value should be a struct, a map or a ptr/interface to struct or map.
+//
+// Index(i int) change value to the corresponding index.
+// Value should be a slice, an array or a ptr/interface to slice or array.
 type AttributeParser interface {
 	Attr(key interface{}) Expectation
 	Index(i int) Expectation
