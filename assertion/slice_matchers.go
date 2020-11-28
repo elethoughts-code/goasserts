@@ -38,7 +38,7 @@ func Contains(e interface{}) Matcher {
 	}
 }
 
-func Unordered(e interface{}) Matcher {
+func Unordered(e interface{}, areEq func(v, e interface{}) bool) Matcher {
 	return func(v interface{}) (MatchResult, error) {
 		iv, isSlice := toSlice(v)
 		if !isSlice {
@@ -56,7 +56,7 @@ func Unordered(e interface{}) Matcher {
 		for _, expectedItem := range ie {
 			found := false
 			for _, sliceItem := range iv {
-				if sliceItem == expectedItem {
+				if areEq(sliceItem, expectedItem) {
 					found = true
 					break
 				}
