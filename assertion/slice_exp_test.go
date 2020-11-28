@@ -43,6 +43,42 @@ func Test_Unordered_should_pass(t *testing.T) {
 	// Then nothing
 }
 
+func Test_UnorderedDeepEq_should_pass(t *testing.T) {
+	// Given
+	assert := assertion.New(t)
+
+	// When
+	assert.That(nil).Unordered(nil)
+
+	assert.That([]string{"a", "b", "c"}).UnorderedDeepEq([]string{"a", "b", "c"})
+	assert.That([]string{"a", "b", "c"}).UnorderedDeepEq([]string{"b", "a", "c"})
+	assert.That([]string{"a", "b", "c"}).UnorderedDeepEq([]string{"c", "a", "b"})
+
+	assert.That([]string{"a", "b", "c"}).Not().UnorderedDeepEq([]string{"a", "b"})
+	assert.That([]string{"a", "b", "c"}).Not().UnorderedDeepEq([]string{"b", "a", "c", "d"})
+	assert.That([]string{"a", "b", "c"}).Not().UnorderedDeepEq([]int{1, 2, 3})
+
+	// Then nothing
+}
+
+func Test_UnorderedNoDiff_should_pass(t *testing.T) {
+	// Given
+	assert := assertion.New(t)
+
+	// When
+	assert.That(nil).Unordered(nil)
+
+	assert.That([]string{"a", "b", "c"}).UnorderedNoDiff([]string{"a", "b", "c"})
+	assert.That([]string{"a", "b", "c"}).UnorderedNoDiff([]string{"b", "a", "c"})
+	assert.That([]string{"a", "b", "c"}).UnorderedNoDiff([]string{"c", "a", "b"})
+
+	assert.That([]string{"a", "b", "c"}).Not().UnorderedNoDiff([]string{"a", "b"})
+	assert.That([]string{"a", "b", "c"}).Not().UnorderedNoDiff([]string{"b", "a", "c", "d"})
+	assert.That([]string{"a", "b", "c"}).Not().UnorderedNoDiff([]int{1, 2, 3})
+
+	// Then nothing
+}
+
 func Test_All_should_pass(t *testing.T) {
 	// Given
 	assert := assertion.New(t)
@@ -136,6 +172,14 @@ func Test_Slice_Matchers_should_fail(t *testing.T) {
 		},
 		{
 			assertFunc: func(assert assertion.Assert) { assert.That([]string{}).Unordered([]string{"b"}) },
+			errLog:     fmt.Sprintf("\nValue should contains all elements : %v", []string{"b"}),
+		},
+		{
+			assertFunc: func(assert assertion.Assert) { assert.That([]string{}).UnorderedDeepEq([]string{"b"}) },
+			errLog:     fmt.Sprintf("\nValue should contains all elements : %v", []string{"b"}),
+		},
+		{
+			assertFunc: func(assert assertion.Assert) { assert.That([]string{}).UnorderedNoDiff([]string{"b"}) },
 			errLog:     fmt.Sprintf("\nValue should contains all elements : %v", []string{"b"}),
 		},
 		{

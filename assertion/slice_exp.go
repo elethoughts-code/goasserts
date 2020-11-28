@@ -1,5 +1,11 @@
 package assertion
 
+import (
+	"reflect"
+
+	"github.com/elethoughts-code/goasserts/diff"
+)
+
 // SliceExpectation interface encloses slice related expectations.
 //
 // Contains(e interface{}) check if e parameter is into the slice.
@@ -15,6 +21,8 @@ package assertion
 type SliceExpectation interface {
 	Contains(e interface{})
 	Unordered(e interface{})
+	UnorderedDeepEq(e interface{})
+	UnorderedNoDiff(e interface{})
 	All(m Matcher)
 	AtLeast(n int, m Matcher)
 	Any(m Matcher)
@@ -27,7 +35,22 @@ func (exp *expectation) Contains(e interface{}) {
 
 func (exp *expectation) Unordered(e interface{}) {
 	exp.t.Helper()
-	exp.Matches(Unordered(e))
+	exp.Matches(Unordered(e, func(v, e interface{}) bool {
+		return v == e
+	}))
+}
+
+func (exp *expectation) UnorderedDeepEq(e interface{}) {
+	exp.t.Helper()
+	exp.Matches(Unordered(e, reflect.DeepEqual))
+}
+
+func (exp *expectation) UnorderedNoDiff(e interface{}) {
+	exp.t.Helper()
+	exp.Matches(Unordered(e, func(v, e interface{}) bool {
+		diffs := diff.Diffs(v, e)
+		return len(diffs) == 0
+	}))
 }
 
 func (exp *expectation) All(m Matcher) {
