@@ -8,6 +8,8 @@ package assertion
 type StringExpectation interface {
 	IsBlank()
 	MatchRe(reg string)
+	HasPrefix(prefix string)
+	HasSuffix(suffix string)
 }
 
 func (exp *expectation) IsBlank() {
@@ -18,4 +20,14 @@ func (exp *expectation) IsBlank() {
 func (exp *expectation) MatchRe(reg string) {
 	exp.t.Helper()
 	exp.Matches(MatchRe(reg))
+}
+
+func (exp *expectation) HasPrefix(prefix string) {
+	exp.t.Helper()
+	exp.Matches(HasPrefix(prefix))
+}
+
+func (exp *expectation) HasSuffix(suffix string) {
+	exp.t.Helper()
+	exp.Matches(HasSuffix(suffix))
 }

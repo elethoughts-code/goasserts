@@ -40,6 +40,30 @@ func Test_MatchRe_should_pass(t *testing.T) {
 	// Then nothing
 }
 
+func Test_HasPrefix_should_pass(t *testing.T) {
+	// Given
+	assert := assertion.New(t)
+
+	// When
+
+	assert.That("123456").HasPrefix("123")
+	assert.That("123456a").Not().HasPrefix("23")
+
+	// Then nothing
+}
+
+func Test_HasSuffix_should_pass(t *testing.T) {
+	// Given
+	assert := assertion.New(t)
+
+	// When
+
+	assert.That("123456").HasSuffix("456")
+	assert.That("123456a").Not().HasSuffix("23")
+
+	// Then nothing
+}
+
 func Test_String_Matchers_should_fail(t *testing.T) {
 	// Mock preparation
 	ctrl := gomock.NewController(t)
