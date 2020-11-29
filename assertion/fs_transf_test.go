@@ -14,7 +14,7 @@ func Test_should_read_file_into_string(t *testing.T) {
 	// When
 	tmpFolder := fsBuilder.TmpDir("", "my_folder_1")
 
-	file := tmpFolder.File("file", os.O_CREATE, 0600).WriteString("hello world")
+	file := tmpFolder.File("file", os.O_CREATE, 0755).WriteString("hello world")
 
 	// Then
 	assert.That(file.Name()).FileAsString().IsEq("hello world")
@@ -35,7 +35,7 @@ func Test_should_read_file_into_struct_as_JSON(t *testing.T) {
 	// When
 	tmpFolder := fsBuilder.TmpDir("", "my_folder_1")
 
-	file := tmpFolder.File("file", os.O_CREATE, 0600).WriteString(`
+	file := tmpFolder.File("file", os.O_CREATE, 0755).WriteString(`
 		{
 			"value1": "hello world",
 			"value2": 10,
@@ -60,7 +60,7 @@ func Test_should_read_file_into_struct_as_YAML(t *testing.T) {
 	// When
 	tmpFolder := fsBuilder.TmpDir("", "my_folder_1")
 
-	file := tmpFolder.File("file", os.O_CREATE, 0600).WriteStringDedent(`
+	file := tmpFolder.File("file", os.O_CREATE, 0755).WriteStringDedent(`
 			value1: hello world
 			value2: 10
 			value3:
@@ -119,7 +119,7 @@ func Test_should_panic_when_reading_file_as_yaml_and_syntax_error(t *testing.T) 
 	// When
 	tmpFolder := fsBuilder.TmpDir("", "my_folder_1")
 
-	file := tmpFolder.File("file", os.O_CREATE, 0600).WriteStringDedent(`
+	file := tmpFolder.File("file", os.O_CREATE, 0755).WriteStringDedent(`
 			value1: hello world
 			value2: 10
 			value3:

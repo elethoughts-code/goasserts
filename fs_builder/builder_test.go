@@ -14,7 +14,7 @@ func Test_should_create_multiple_folder_hierarchy(t *testing.T) {
 	assert := assertion.New(t)
 
 	tmp := fsBuilder.TmpDir("", ".")
-	tmp.Dir("d1", 0600).Dir("d2", 0600).Dir("d31", 0600).Parent().Dir("d32", 0600)
+	tmp.Dir("d1", 0755).Dir("d2", 0755).Dir("d31", 0755).Parent().Dir("d32", 0755)
 
 	assert.That(filepath.Join(tmp.Name(), "d1")).FileExists()
 	assert.That(filepath.Join(tmp.Name(), "d1", "d2")).FileExists()
@@ -27,10 +27,10 @@ func Test_Builder_should_make_tmp_folders_and_files(t *testing.T) {
 
 	// When
 	tmpFolder := fsBuilder.TmpDir("", "my_folder_1")
-	subFolder1 := tmpFolder.Dir("my_sub_folder", 0600)
+	subFolder1 := tmpFolder.Dir("my_sub_folder", 0755)
 
-	file1 := tmpFolder.File("my_file_1", os.O_CREATE, 0600)
-	file2 := subFolder1.File("my_file_2", os.O_CREATE, 0600)
+	file1 := tmpFolder.File("my_file_1", os.O_CREATE, 0755)
+	file2 := subFolder1.File("my_file_2", os.O_CREATE, 0755)
 
 	file2.Write([]byte("Hello world !"))
 
@@ -54,7 +54,7 @@ func Test_Builder_should_write_file_dedent(t *testing.T) {
 	// When
 	tmpFolder := fsBuilder.TmpDir("", "my_folder_1")
 	file1 := tmpFolder.
-		File("my_file_1", os.O_CREATE, 0600).
+		File("my_file_1", os.O_CREATE, 0755).
 		WriteStringDedent(`
 						a:
 						  b: some text
@@ -82,7 +82,7 @@ func Test_Builder_should_write_file_dedent_2(t *testing.T) {
 	// When
 	tmpFolder := fsBuilder.TmpDir("", "my_folder_1")
 	file1 := tmpFolder.
-		File("my_file_1", os.O_CREATE, 0600).
+		File("my_file_1", os.O_CREATE, 0755).
 		WriteStringDedent(`
 						a:
 						  b: some text
@@ -110,7 +110,7 @@ func Test_Builder_should_not_dedent_when_no_consistent_leading_spaces(t *testing
 	// When
 	tmpFolder := fsBuilder.TmpDir("", "my_folder_1")
 	file1 := tmpFolder.
-		File("my_file_1", os.O_CREATE, 0600).
+		File("my_file_1", os.O_CREATE, 0755).
 		WriteStringDedent(`
 							a:
 						  b: some text
@@ -159,7 +159,7 @@ func Test_Remove_should_panic_when_already_removed_file(t *testing.T) {
 		assert.That(r).IsError(os.ErrNotExist)
 	}()
 	tmp := fsBuilder.TmpDir("", "my_folder_1")
-	file := tmp.File("my_file", os.O_CREATE, 0600)
+	file := tmp.File("my_file", os.O_CREATE, 0755)
 	file.Remove()
 	file.Remove()
 
@@ -173,7 +173,7 @@ func Test_Dir_should_panic_when_already_created(t *testing.T) {
 		assert.That(r).IsError(os.ErrExist)
 	}()
 	tmp := fsBuilder.TmpDir("", "folder")
-	tmp.File("my_dir", os.O_CREATE, 0600).Parent().Dir("my_dir", 0600)
+	tmp.File("my_dir", os.O_CREATE, 0755).Parent().Dir("my_dir", 0755)
 	t.Cleanup(tmp.RemoveAll)
 }
 
@@ -184,7 +184,7 @@ func Test_File_should_panic_when_not_creating_and_non_existing_file(t *testing.T
 		assert.That(r).IsError(os.ErrNotExist)
 	}()
 	tmp := fsBuilder.TmpDir("", "folder")
-	tmp.File("my_file", os.O_RDONLY, 0600)
+	tmp.File("my_file", os.O_RDONLY, 0755)
 	t.Cleanup(tmp.RemoveAll)
 }
 
@@ -195,7 +195,7 @@ func Test_File_should_panic_when_writing_to_removed_file(t *testing.T) {
 		assert.That(r).IsError(os.ErrNotExist)
 	}()
 	tmp := fsBuilder.TmpDir("", "folder")
-	f := tmp.File("my_file", os.O_CREATE, 0600)
+	f := tmp.File("my_file", os.O_CREATE, 0755)
 	tmp.RemoveAll()
 	f.WriteString("abc")
 }
