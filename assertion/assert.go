@@ -41,9 +41,12 @@ type Expectation interface {
 	StringExpectation
 	SliceExpectation
 	MapExpectation
+	FsExpectation
 	MapTransformer
+	FsTransformer
 	AttributeParser
 	HTTPRecorderParser
+	ReflectTransformer
 }
 
 type assert struct {

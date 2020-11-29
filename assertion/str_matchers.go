@@ -3,6 +3,7 @@ package assertion
 import (
 	"fmt"
 	"regexp"
+	"strings"
 )
 
 func IsBlank() Matcher {
@@ -28,5 +29,23 @@ func MatchRe(reg string) Matcher {
 			return truthy(fmt.Sprintf("\nValue should not match regexp : %s", reg))
 		}
 		return falsy(fmt.Sprintf("\nValue do not match regexp : %s", reg))
+	}
+}
+
+func HasPrefix(prefix string) Matcher {
+	return func(v interface{}) (MatchResult, error) {
+		if strings.HasPrefix(v.(string), prefix) {
+			return truthy(fmt.Sprintf("\nValue should have prefix = %s", prefix))
+		}
+		return falsy(fmt.Sprintf("\nValue should not have prefix = %s", prefix))
+	}
+}
+
+func HasSuffix(suffix string) Matcher {
+	return func(v interface{}) (MatchResult, error) {
+		if strings.HasSuffix(v.(string), suffix) {
+			return truthy(fmt.Sprintf("\nValue should have suffix = %s", suffix))
+		}
+		return falsy(fmt.Sprintf("\nValue should not have suffix = %s", suffix))
 	}
 }
