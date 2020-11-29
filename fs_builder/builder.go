@@ -121,7 +121,7 @@ func (f *fileBuilder) Parent() D {
 }
 
 func (f *fileBuilder) Write(content []byte) F {
-	err := ioutil.WriteFile(f.name, content, 0755)
+	err := ioutil.WriteFile(f.name, content, 0600)
 	if err != nil {
 		panic(err)
 	}
