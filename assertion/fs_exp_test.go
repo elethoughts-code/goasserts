@@ -18,11 +18,11 @@ func Test_File_exists_should_check_file_existence(t *testing.T) {
 	// When
 	tmpFolder := fsBuilder.TmpDir("", "my_folder_1")
 
-	file4 := tmpFolder.Dir("my_sub_folder", 0600).
-		File("file_1", os.O_CREATE, 0600).Parent().
-		File("file_2", os.O_CREATE, 0600).Parent().
-		File("file_3", os.O_CREATE, 0600).Root().
-		File("file_4", os.O_CREATE, 0600)
+	file4 := tmpFolder.Dir("my_sub_folder", 0755).
+		File("file_1", os.O_CREATE, 0755).Parent().
+		File("file_2", os.O_CREATE, 0755).Parent().
+		File("file_3", os.O_CREATE, 0755).Root().
+		File("file_4", os.O_CREATE, 0755)
 
 	// Then
 

@@ -8,9 +8,6 @@ before_install:
 - go get github.com/mattn/goveralls
 script:
 - make lint
-- export TMPDIR="`pwd`/tmp"
-- mkdir $TMPDIR
-- ls -ahl
 - go test -v ./... -covermode=count -coverprofile=coverage.out
 - $HOME/gopath/bin/goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
 env:
