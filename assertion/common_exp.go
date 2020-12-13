@@ -24,6 +24,7 @@ type CommonExpectation interface {
 	IsDeepEq(e interface{})
 	NoDiff(e interface{})
 	Similar(e interface{})
+	SimilarUnordered(e interface{})
 	IsNil()
 	HaveKind(k reflect.Kind)
 	IsError(target error)
@@ -47,7 +48,12 @@ func (exp *expectation) NoDiff(e interface{}) {
 
 func (exp *expectation) Similar(e interface{}) {
 	exp.t.Helper()
-	exp.Matches(Similar(e))
+	exp.Matches(Similar(e, false))
+}
+
+func (exp *expectation) SimilarUnordered(e interface{}) {
+	exp.t.Helper()
+	exp.Matches(Similar(e, true))
 }
 
 func (exp *expectation) IsNil() {

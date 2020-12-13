@@ -14,7 +14,7 @@ func Test_similar_invalid_values_diff(t *testing.T) {
 
 	// When
 
-	findSimilarityDiffs([]string{"a", "b", "c"}, va, vb, &diffs, map[similarVisit]bool{})
+	findSimilarityDiffs([]string{"a", "b", "c"}, va, vb, &diffs, map[similarVisit]bool{}, false)
 
 	// Then
 	if !reflect.DeepEqual(diffs, []Diff{

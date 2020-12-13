@@ -69,9 +69,9 @@ func IsDeepEq(e interface{}) Matcher {
 	}
 }
 
-func Similar(e interface{}) Matcher {
+func Similar(e interface{}, checkUnordered bool) Matcher {
 	return func(v interface{}) (MatchResult, error) {
-		diffs := diff.Similar(v, e)
+		diffs := diff.Similar(v, e, checkUnordered)
 		if len(diffs) == 0 {
 			return truthy("Value should be similar to expectation")
 		}

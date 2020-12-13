@@ -14,8 +14,8 @@ func Test_Similar_simple_one_level_differences_functions(t *testing.T) {
 	// Given
 
 	// When
-	d1 := diff.Similar(func() {}, func() {})
-	d2 := diff.Similar(nil, nil)
+	d1 := diff.Similar(func() {}, func() {}, false)
+	d2 := diff.Similar(nil, nil, false)
 
 	// Then
 	if !errors.As(d1[0].Value, &diff.FuncDiff{}) || d1[0].Value.Error() != "functions cannot be compared" {
@@ -172,7 +172,7 @@ func Test_Similar_simple_one_level_differences(t *testing.T) {
 
 	for i, tc := range testCases {
 		// When
-		d := diff.Similar(tc.a, tc.b)
+		d := diff.Similar(tc.a, tc.b, false)
 		// Then
 		if !reflect.DeepEqual(d, tc.result) {
 			t.Logf("%v", i)
@@ -330,7 +330,7 @@ func Test_Similar_simple_second_level_differences(t *testing.T) {
 
 	for _, tc := range testCases {
 		// When
-		d := diff.Similar(tc.a, tc.b)
+		d := diff.Similar(tc.a, tc.b, false)
 		// Then
 		if !reflect.DeepEqual(d, tc.result) {
 			t.Fail()
@@ -519,7 +519,7 @@ func Test_Similar_multi_level_differences(t *testing.T) {
 
 	for _, tc := range testCases {
 		// When
-		d := diff.Similar(tc.a, tc.b)
+		d := diff.Similar(tc.a, tc.b, false)
 		// Then
 		if !reflect.DeepEqual(diffMap(d), diffMap(tc.result)) {
 			t.Fail()
@@ -536,4 +536,255 @@ func diffMap(diffs []diff.Diff) map[string]diff.Diff {
 		panic("same path found")
 	}
 	return m
+}
+
+func Test_Similar_Unordered_simple_one_level_differences(t *testing.T) {
+	// Given
+
+	rootLevelDiffs := func(values ...error) []diff.Diff {
+		diffs := make([]diff.Diff, len(values))
+		for i, v := range values {
+			diffs[i] = diff.Diff{
+				Path:  []string{},
+				Value: v,
+			}
+		}
+		return diffs
+	}
+	path := func(p ...string) []string { return p }
+	diffs := func(d ...diff.Diff) []diff.Diff { return d }
+	d := func(path []string, value error) diff.Diff {
+		return diff.Diff{
+			Path:  path,
+			Value: value,
+		}
+	}
+	os := OtherStruct{
+		A: nil,
+		B: map[string][]int{
+			"x": {1},
+			"y": {1, 2},
+			"z": {1, 2, 3},
+		},
+		C: nil,
+		D: 0,
+		E: false,
+	}
+	os2 := OtherStruct{
+		A: nil,
+		B: nil,
+		C: nil,
+		D: 0,
+		E: true,
+	}
+
+	type ComparableStr struct {
+		A string
+	}
+
+	type ComparableStr2 struct {
+		A string
+	}
+	testCases := []struct {
+		a      interface{}
+		b      interface{}
+		result []diff.Diff
+	}{
+		{
+			a:      []string{"a", "b", "c"},
+			b:      []string{"a", "d", "c"},
+			result: rootLevelDiffs(diff.CommonDiff{A: []interface{}{"a", "b", "c"}, B: []interface{}{"a", "d", "c"}}),
+		},
+		{
+			a: []string{"a", "b", "c"},
+			b: []string{"a", "b"},
+			result: rootLevelDiffs(diff.LenDiff{
+				CommonDiff: diff.CommonDiff{A: []string{"a", "b", "c"}, B: []string{"a", "b"}},
+				Value:      1,
+			}),
+		},
+
+		{
+			a: []ComparableStr{{"a"}, {"b"}, {"c"}},
+			b: []ComparableStr{{"a"}, {"b"}, {"d"}},
+			result: rootLevelDiffs(diff.CommonDiff{
+				A: []interface{}{ComparableStr{"a"}, ComparableStr{"b"}, ComparableStr{"c"}},
+				B: []interface{}{ComparableStr{"a"}, ComparableStr{"b"}, ComparableStr{"d"}},
+			}),
+		},
+		{
+			a: []ComparableStr{{"a"}, {"b"}, {"c"}},
+			b: []interface{}{ComparableStr{"a"}, &ComparableStr{"b"}, ComparableStr{"d"}},
+			result: rootLevelDiffs(diff.CommonDiff{
+				A: []interface{}{ComparableStr{"a"}, ComparableStr{"b"}, ComparableStr{"c"}},
+				B: []interface{}{ComparableStr{"a"}, ComparableStr{"b"}, ComparableStr{"d"}},
+			}),
+		},
+		{
+			a:      []ComparableStr{{"a"}, {"b"}, {"c"}},
+			b:      []ComparableStr2{{"a"}, {"b"}, {"d"}},
+			result: diffs(d(path("[2]", "[A]"), diff.CommonDiff{A: "c", B: "d"})),
+		},
+		{
+			a:      []interface{}{ComparableStr{"a"}, ComparableStr{"b"}, ComparableStr{"c"}},
+			b:      []interface{}{ComparableStr{"a"}, "b", ComparableStr{"c"}},
+			result: diffs(d(path("[1]"), diff.TypeDiff{A: ComparableStr{"b"}, B: "b"})),
+		},
+		{
+			a: SampleStruct{
+				A: 1,
+				B: "b1",
+				C: OtherStruct{
+					A: []OtherStruct{{D: 1}, {D: 2}, {D: 3}},
+					B: nil,
+					C: nil,
+					D: 0,
+					E: false,
+				},
+				D: &os,
+			},
+			b: map[string]interface{}{
+				"A": 2,
+				"B": "b2",
+				"C": map[string]interface{}{
+					"A": []OtherStruct{{D: 1}, {D: 2}, {D: 4}},
+					"B": nil,
+					"C": nil,
+					"D": uint8(0),
+					"E": false,
+				},
+				"D": nil,
+			},
+			result: diffs(
+				d(path("[A]"), diff.CommonDiff{A: int64(1), B: int64(2)}),
+				d(path("[B]"), diff.CommonDiff{A: "b1", B: "b2"}),
+				d(path("[C]", "[A]", "[2]", "[D]"), diff.CommonDiff{A: uint64(3), B: uint64(4)}),
+				d(path("[D]", "[A]"), diff.KeyNotFoundDiff{Key: "A", A: true, B: false}),
+				d(path("[D]", "[B]"), diff.KeyNotFoundDiff{Key: "B", A: true, B: false}),
+				d(path("[D]", "[C]"), diff.KeyNotFoundDiff{Key: "C", A: true, B: false}),
+				d(path("[D]", "[D]"), diff.KeyNotFoundDiff{Key: "D", A: true, B: false}),
+				d(path("[D]", "[E]"), diff.KeyNotFoundDiff{Key: "E", A: true, B: false}),
+			),
+		},
+		{
+			a: SampleStruct{
+				A: 1,
+				B: "b1",
+				C: OtherStruct{
+					A: []OtherStruct{{D: 1}, {D: 2}, {D: 3}},
+					B: nil,
+					C: nil,
+					D: 0,
+					E: false,
+				},
+				D: &os,
+			},
+			b: SampleStruct{
+				A: 2,
+				B: "b2",
+				C: OtherStruct{
+					A: []OtherStruct{{D: 1}, {D: 2}, {D: 4}},
+					B: nil,
+					C: nil,
+					D: 0,
+					E: false,
+				},
+				D: nil,
+			},
+			result: diffs(
+				d(path("[A]"), diff.CommonDiff{A: int64(1), B: int64(2)}),
+				d(path("[B]"), diff.CommonDiff{A: "b1", B: "b2"}),
+				d(path("[C]", "[A]", "[2]", "[D]"), diff.CommonDiff{A: uint64(3), B: uint64(4)}),
+				d(path("[D]", "[A]"), diff.KeyNotFoundDiff{Key: "A", A: true, B: false}),
+				d(path("[D]", "[B]"), diff.KeyNotFoundDiff{Key: "B", A: true, B: false}),
+				d(path("[D]", "[C]"), diff.KeyNotFoundDiff{Key: "C", A: true, B: false}),
+				d(path("[D]", "[D]"), diff.KeyNotFoundDiff{Key: "D", A: true, B: false}),
+				d(path("[D]", "[E]"), diff.KeyNotFoundDiff{Key: "E", A: true, B: false}),
+			),
+		},
+		{
+			a: SampleStruct{
+				A: 1,
+				B: "b1",
+				C: OtherStruct{
+					A: []OtherStruct{{D: 1}, {D: 2}, {D: 3}},
+					B: nil,
+					C: nil,
+					D: 0,
+					E: false,
+				},
+				D: &os,
+			},
+			b: SampleStruct{
+				A: 2,
+				B: "b2",
+				C: OtherStruct{
+					A: []OtherStruct{{D: 1}, {D: 2}, {D: 4}},
+					B: nil,
+					C: nil,
+					D: 0,
+					E: false,
+				},
+				D: &os2,
+			},
+			result: diffs(
+				d(path("[A]"), diff.CommonDiff{A: int64(1), B: int64(2)}),
+				d(path("[B]"), diff.CommonDiff{A: "b1", B: "b2"}),
+				d(path("[C]", "[A]", "[2]", "[D]"), diff.CommonDiff{A: uint64(3), B: uint64(4)}),
+				d(path("[D]", "[B]", "[x]"), diff.KeyNotFoundDiff{Key: "x", A: true, B: false}),
+				d(path("[D]", "[B]", "[y]"), diff.KeyNotFoundDiff{Key: "y", A: true, B: false}),
+				d(path("[D]", "[B]", "[z]"), diff.KeyNotFoundDiff{Key: "z", A: true, B: false}),
+				d(path("[D]", "[E]"), diff.CommonDiff{A: false, B: true}),
+			),
+		},
+		{
+			a: SampleStruct{
+				A: 1,
+				B: "b1",
+				C: OtherStruct{
+					A: []OtherStruct{{D: 1}, {D: 2}, {D: 3}},
+					B: nil,
+					C: nil,
+					D: 0,
+					E: false,
+				},
+				D: &os,
+			},
+			b: map[string]interface{}{
+				"A": 2,
+				"B": "b2",
+				"C": map[string]interface{}{
+					"A": []interface{}{
+						map[string]interface{}{"A": nil, "B": nil, "C": nil, "D": uint8(1), "E": false},
+						OtherStruct{D: 2},
+						OtherStruct{D: 4}},
+					"B": nil,
+					"C": nil,
+					"D": uint8(0),
+					"E": false,
+				},
+				"D": &os2,
+			},
+			result: diffs(
+				d(path("[A]"), diff.CommonDiff{A: int64(1), B: int64(2)}),
+				d(path("[B]"), diff.CommonDiff{A: "b1", B: "b2"}),
+				d(path("[C]", "[A]", "[2]", "[D]"), diff.CommonDiff{A: uint64(3), B: uint64(4)}),
+				d(path("[D]", "[B]", "[x]"), diff.KeyNotFoundDiff{Key: "x", A: true, B: false}),
+				d(path("[D]", "[B]", "[y]"), diff.KeyNotFoundDiff{Key: "y", A: true, B: false}),
+				d(path("[D]", "[B]", "[z]"), diff.KeyNotFoundDiff{Key: "z", A: true, B: false}),
+				d(path("[D]", "[E]"), diff.CommonDiff{A: false, B: true}),
+			),
+		},
+	}
+
+	for _, tc := range testCases {
+		// When
+		d := diff.Similar(tc.a, tc.b, true)
+		// Then
+		if !reflect.DeepEqual(diffMap(d), diffMap(tc.result)) {
+			t.Logf("%v \n\n", diffMap(d))
+			t.Logf("%v \n\n", diffMap(tc.result))
+			t.Fail()
+		}
+	}
 }
