@@ -69,6 +69,20 @@ func IsDeepEq(e interface{}) Matcher {
 	}
 }
 
+func Similar(e interface{}) Matcher {
+	return func(v interface{}) (MatchResult, error) {
+		diffs := diff.Similar(v, e)
+		if len(diffs) == 0 {
+			return truthy("Value should be similar to expectation")
+		}
+		falsyMsg := "Value have following dissimilarities with expectation :"
+		for _, d := range diffs {
+			falsyMsg += fmt.Sprintf("\nPath %v : %v", d.Path, d.Value)
+		}
+		return falsy(falsyMsg)
+	}
+}
+
 func NoDiff(e interface{}) Matcher {
 	return func(v interface{}) (MatchResult, error) {
 		diffs := diff.Diffs(v, e)

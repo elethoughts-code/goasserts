@@ -384,3 +384,163 @@ func Test_NoDiff_should_not_pass_2(t *testing.T) {
 	// When
 	assert.That(a).NoDiff(b)
 }
+
+func Test_Similar_should_pass(t *testing.T) {
+	// Given
+	assert := assertion.New(t)
+	os := OtherStruct{D: 0, E: true}
+	os2 := OtherStruct{D: 0, E: true}
+	a := SampleStruct{
+		A: 1,
+		B: "b1",
+		C: OtherStruct{
+			A: []OtherStruct{{D: 1}, {D: 2}, {D: 3}},
+			B: nil,
+			C: nil,
+			D: 0,
+			E: false,
+		},
+		D: &os,
+	}
+	b := SampleStruct{
+		A: 1,
+		B: "b1",
+		C: OtherStruct{
+			A: []OtherStruct{{D: 1}, {D: 2}, {D: 3}},
+			B: nil,
+			C: nil,
+			D: 0,
+			E: false,
+		},
+		D: &os,
+	}
+	c := SampleStruct{
+		A: 2,
+		B: "b2",
+		C: OtherStruct{
+			A: []OtherStruct{{D: 1}, {D: 2}, {D: 4}},
+			B: nil,
+			C: nil,
+			D: 0,
+			E: false,
+		},
+		D: &os2,
+	}
+	d := map[string]interface{}{
+		"A": 1,
+		"B": "b1",
+		"C": OtherStruct{
+			A: []OtherStruct{{D: 1}, {D: 2}, {D: 3}},
+			B: nil,
+			C: nil,
+			D: 0,
+			E: false,
+		},
+		"D": &os,
+	}
+
+	// When
+	assert.That(a).Similar(b)
+	assert.That(a).Not().Similar(c)
+	assert.That(a).Similar(d)
+	assert.That([]interface{}{d["A"], d["B"], d["C"], d["D"]}).Similar([]interface{}{
+		1, "b1", map[string]interface{}{
+			"A": []interface{}{OtherStruct{D: 1}, OtherStruct{D: 2}, OtherStruct{D: 3}},
+			"B": nil,
+			"C": nil,
+			"D": uint8(0),
+			"E": false,
+		},
+		&os,
+	})
+}
+
+func Test_Similar_should_not_pass_1(t *testing.T) {
+	// Given
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	os := OtherStruct{D: 0, E: true}
+	a := SampleStruct{
+		A: 1,
+		B: "b1",
+		C: OtherStruct{
+			A: []OtherStruct{{D: 1}, {D: 2}, {D: 3}},
+			B: nil,
+			C: nil,
+			D: 0,
+			E: false,
+		},
+		D: &os,
+	}
+	b := SampleStruct{
+		A: 1,
+		B: "b1",
+		C: OtherStruct{
+			A: []OtherStruct{{D: 1}, {D: 2}, {D: 3}},
+			B: nil,
+			C: nil,
+			D: 0,
+			E: false,
+		},
+		D: &os,
+	}
+
+	// Expectation
+	tMock := mocks.NewMockPublicTB(ctrl)
+	assert := assertion.New(tMock)
+	tMock.EXPECT().Helper().AnyTimes()
+	tMock.EXPECT().Error("Value should be similar to expectation")
+
+	// When
+	assert.That(a).Not().Similar(b)
+}
+
+func Test_Similar_should_not_pass_2(t *testing.T) {
+	// Given
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+	os := OtherStruct{D: 0, E: true}
+	os2 := OtherStruct{D: 0, E: true}
+	a := SampleStruct{
+		A: 1,
+		B: "b1",
+		C: OtherStruct{
+			A: []OtherStruct{{D: 1}, {D: 2}, {D: 3}},
+			B: nil,
+			C: nil,
+			D: 0,
+			E: false,
+		},
+		D: &os,
+	}
+	b := SampleStruct{
+		A: 2,
+		B: "b2",
+		C: OtherStruct{
+			A: []OtherStruct{{D: 1}, {D: 2}, {D: 4}},
+			B: nil,
+			C: nil,
+			D: 0,
+			E: false,
+		},
+		D: &os2,
+	}
+
+	// Expectation
+	tMock := mocks.NewMockPublicTB(ctrl)
+	assert := assertion.New(tMock)
+	tMock.EXPECT().Helper().AnyTimes()
+	tMock.EXPECT().Error("Value have following dissimilarities with expectation :\n" +
+		"Path [[A]] : values diff\n" +
+		"A=1\n" +
+		"B=2\n" +
+		"Path [[B]] : values diff\n" +
+		"A=b1\n" +
+		"B=b2\n" +
+		"Path [[C] [A] [2] [D]] : values diff\n" +
+		"A=3\n" +
+		"B=4")
+
+	// When
+	assert.That(a).Similar(b)
+}
