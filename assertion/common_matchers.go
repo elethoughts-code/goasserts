@@ -1,6 +1,7 @@
 package assertion
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"reflect"
@@ -69,6 +70,29 @@ func IsDeepEq(e interface{}) Matcher {
 	}
 }
 
+func Similar(e interface{}, checkUnordered bool) Matcher {
+	return func(v interface{}) (MatchResult, error) {
+		diffs := diff.Similar(v, e, checkUnordered)
+		if len(diffs) == 0 {
+			return truthy("Value should be similar to expectation")
+		}
+		falsyMsg := "Value have following dissimilarities with expectation :"
+		for _, d := range diffs {
+			falsyMsg += fmt.Sprintf("\nPath %v : %v", d.Path, d.Value)
+		}
+		return falsy(falsyMsg)
+	}
+}
+
+func SimilarFromJSON(e string, checkUnordered bool) Matcher {
+	return func(v interface{}) (MatchResult, error) {
+		var parsed interface{}
+		if err := json.Unmarshal([]byte(e), &parsed); err != nil {
+			return errored(err)
+		}
+		return Similar(parsed, checkUnordered)(v)
+	}
+}
 func NoDiff(e interface{}) Matcher {
 	return func(v interface{}) (MatchResult, error) {
 		diffs := diff.Diffs(v, e)
