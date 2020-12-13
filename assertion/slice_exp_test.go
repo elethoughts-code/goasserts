@@ -188,7 +188,7 @@ func Test_Slice_Matchers_should_fail(t *testing.T) {
 		},
 		{
 			assertFunc: func(assert assertion.Assert) { assert.That([]string{"b", "c"}).Unordered([]string{"a", "b"}) },
-			errLog:     fmt.Sprintf("\nElement [%v] not found", "a"),
+			errLog:     fmt.Sprintf("\nElement [%d]=%v not found", 0, "a"),
 		},
 		{
 			assertFunc: func(assert assertion.Assert) {
@@ -303,4 +303,20 @@ func Test_Slice_Matchers_should_fail_with_error(t *testing.T) {
 		// When
 		entry.assertFunc(assert)
 	}
+}
+
+func Test_Every_should_pass(t *testing.T) {
+	// Given
+	assert := assertion.New(t)
+
+	// When
+	assert.That(nil).Unordered(nil)
+
+	assert.That([]string{"a", "b", "c"}).Every([]func(interface{}) bool{
+		func(v interface{}) bool { return v == "b" },
+		func(v interface{}) bool { return v == "c" },
+		func(v interface{}) bool { return v == "a" },
+	})
+
+	// Then nothing
 }

@@ -26,6 +26,7 @@ type SliceExpectation interface {
 	All(m Matcher)
 	AtLeast(n int, m Matcher)
 	Any(m Matcher)
+	Every(matchers []func(v interface{}) bool)
 }
 
 func (exp *expectation) Contains(e interface{}) {
@@ -66,4 +67,12 @@ func (exp *expectation) AtLeast(n int, m Matcher) {
 func (exp *expectation) Any(m Matcher) {
 	exp.t.Helper()
 	exp.Matches(AtLeast(1, m))
+}
+
+func (exp *expectation) Every(matchers []func(v interface{}) bool) {
+	exp.t.Helper()
+	exp.Matches(Unordered(matchers, func(v, e interface{}) bool {
+		currentM := e.(func(v interface{}) bool)
+		return currentM(v)
+	}))
 }

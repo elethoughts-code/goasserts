@@ -53,7 +53,7 @@ func Unordered(e interface{}, areEq func(v, e interface{}) bool) Matcher {
 			return falsy(fmt.Sprintf("\nValue should contains all elements : %v", e))
 		}
 
-		for _, expectedItem := range ie {
+		for i, expectedItem := range ie {
 			found := false
 			for _, sliceItem := range iv {
 				if areEq(sliceItem, expectedItem) {
@@ -62,7 +62,7 @@ func Unordered(e interface{}, areEq func(v, e interface{}) bool) Matcher {
 				}
 			}
 			if !found {
-				return falsy(fmt.Sprintf("\nElement [%v] not found", expectedItem))
+				return falsy(fmt.Sprintf("\nElement [%d]=%v not found", i, expectedItem))
 			}
 		}
 		return truthy(fmt.Sprintf("\nValue should not contain all elements : %v", e))
