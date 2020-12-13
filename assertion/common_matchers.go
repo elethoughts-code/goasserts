@@ -1,6 +1,7 @@
 package assertion
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"reflect"
@@ -83,6 +84,15 @@ func Similar(e interface{}, checkUnordered bool) Matcher {
 	}
 }
 
+func SimilarFromJSON(e string, checkUnordered bool) Matcher {
+	return func(v interface{}) (MatchResult, error) {
+		var parsed interface{}
+		if err := json.Unmarshal([]byte(e), &parsed); err != nil {
+			return errored(err)
+		}
+		return Similar(parsed, checkUnordered)(v)
+	}
+}
 func NoDiff(e interface{}) Matcher {
 	return func(v interface{}) (MatchResult, error) {
 		diffs := diff.Diffs(v, e)

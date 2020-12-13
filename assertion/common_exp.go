@@ -1,6 +1,8 @@
 package assertion
 
-import "reflect"
+import (
+	"reflect"
+)
 
 // CommonExpectation interface hold commonly used expectations.
 // It also exposes Matches(m Matcher) as a generic expectation method.
@@ -25,6 +27,7 @@ type CommonExpectation interface {
 	NoDiff(e interface{})
 	Similar(e interface{})
 	SimilarUnordered(e interface{})
+	SimilarFromJSON(e string)
 	IsNil()
 	HaveKind(k reflect.Kind)
 	IsError(target error)
@@ -49,6 +52,11 @@ func (exp *expectation) NoDiff(e interface{}) {
 func (exp *expectation) Similar(e interface{}) {
 	exp.t.Helper()
 	exp.Matches(Similar(e, false))
+}
+
+func (exp *expectation) SimilarFromJSON(e string) {
+	exp.t.Helper()
+	exp.Matches(SimilarFromJSON(e, true))
 }
 
 func (exp *expectation) SimilarUnordered(e interface{}) {

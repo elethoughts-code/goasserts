@@ -742,3 +742,39 @@ func Test_Similar_unordered_should_not_pass_3(t *testing.T) {
 		{"c"}, {"b"}, {"d"},
 	})
 }
+
+
+func Test_Similar_from_json_should_pass(t *testing.T) {
+	// Given
+	assert := assertion.New(t)
+	type SampleStr struct {
+		A string
+		B []string
+	}
+
+	// When
+	assert.That("a").SimilarFromJSON(`"a"`)
+	assert.That([]string{"a", "b", "c"}).SimilarFromJSON(`["b", "a", "c"]`)
+	assert.That(SampleStr{
+		A: "abc",
+		B: []string{"a", "b", "c"},
+	}).SimilarFromJSON(`{
+		"A": "abc",
+		"B": ["b", "a", "c"]
+	}`)
+}
+
+func Test_Similar_from_json_should_fail_when_bad_json(t *testing.T) {
+	// Given
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	// Expectation
+	tMock := mocks.NewMockPublicTB(ctrl)
+	assert := assertion.New(tMock)
+	tMock.EXPECT().Helper().AnyTimes()
+	tMock.EXPECT().Fatalf("\n%s", "invalid character 'a' looking for beginning of value")
+
+	// When
+	assert.That("a").SimilarFromJSON(`a`)
+}
