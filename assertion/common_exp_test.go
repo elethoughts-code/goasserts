@@ -743,7 +743,6 @@ func Test_Similar_unordered_should_not_pass_3(t *testing.T) {
 	})
 }
 
-
 func Test_Similar_from_json_should_pass(t *testing.T) {
 	// Given
 	assert := assertion.New(t)
