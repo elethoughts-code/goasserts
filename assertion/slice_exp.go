@@ -23,9 +23,9 @@ type SliceExpectation interface {
 	Unordered(e interface{})
 	UnorderedDeepEq(e interface{})
 	UnorderedNoDiff(e interface{})
-	All(m Matcher)
-	AtLeast(n int, m Matcher)
-	Any(m Matcher)
+	All(m func(v interface{}) bool)
+	AtLeast(n int, m func(v interface{}) bool)
+	Any(m func(v interface{}) bool)
 	Every(matchers []func(v interface{}) bool)
 }
 
@@ -54,17 +54,17 @@ func (exp *expectation) UnorderedNoDiff(e interface{}) {
 	}))
 }
 
-func (exp *expectation) All(m Matcher) {
+func (exp *expectation) All(m func(v interface{}) bool) {
 	exp.t.Helper()
 	exp.Matches(All(m))
 }
 
-func (exp *expectation) AtLeast(n int, m Matcher) {
+func (exp *expectation) AtLeast(n int, m func(v interface{}) bool) {
 	exp.t.Helper()
 	exp.Matches(AtLeast(n, m))
 }
 
-func (exp *expectation) Any(m Matcher) {
+func (exp *expectation) Any(m func(v interface{}) bool) {
 	exp.t.Helper()
 	exp.Matches(AtLeast(1, m))
 }

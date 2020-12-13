@@ -69,7 +69,7 @@ func Unordered(e interface{}, areEq func(v, e interface{}) bool) Matcher {
 	}
 }
 
-func applyMatcherToAllElements(v interface{}, matcher Matcher) (int, []int, []int, error) {
+func applyMatcherToAllElements(v interface{}, matcher func(v interface{}) bool) (int, []int, []int, error) {
 	iv, isSlice := toSlice(v)
 	if !isSlice {
 		return 0, nil, nil, ErrNotOfSliceType
@@ -77,11 +77,8 @@ func applyMatcherToAllElements(v interface{}, matcher Matcher) (int, []int, []in
 	truthyIndex := make([]int, 0)
 	falsyIndex := make([]int, 0)
 	for i, item := range iv {
-		mr, err := matcher(item)
-		if err != nil {
-			return 0, nil, nil, err
-		}
-		if mr.Matches {
+		mr := matcher(item)
+		if mr {
 			truthyIndex = append(truthyIndex, i)
 		} else {
 			falsyIndex = append(falsyIndex, i)
@@ -90,7 +87,7 @@ func applyMatcherToAllElements(v interface{}, matcher Matcher) (int, []int, []in
 	return len(iv), truthyIndex, falsyIndex, nil
 }
 
-func All(matcher Matcher) Matcher {
+func All(matcher func(v interface{}) bool) Matcher {
 	return func(v interface{}) (MatchResult, error) {
 		vLen, truthyIndex, falsyIndex, err := applyMatcherToAllElements(v, matcher)
 		if err != nil {
@@ -104,7 +101,7 @@ func All(matcher Matcher) Matcher {
 	}
 }
 
-func AtLeast(n int, matcher Matcher) Matcher {
+func AtLeast(n int, matcher func(v interface{}) bool) Matcher {
 	return func(v interface{}) (MatchResult, error) {
 		_, truthyIndex, falsyIndex, err := applyMatcherToAllElements(v, matcher)
 		if err != nil {
