@@ -224,11 +224,34 @@ func findSimilarityDiffs(currentPath []string, va, vb reflect.Value, diffs *[]Di
 	}
 
 	// Check simple types
-	checkSimpleTypes(currentPath, va, vb, ka, diffs, visited, checkUnordered)
+	checkSimpleTypes(currentPath, va, vb, ka, kb, diffs, visited, checkUnordered)
+}
+
+func asNumeric(v reflect.Value, k reflect.Kind) (float64, bool) {
+	switch k {
+	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
+		return float64(v.Int()), true
+	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		return float64(v.Uint()), true
+	case reflect.Float32, reflect.Float64:
+		return v.Float(), true
+	default:
+		return 0, false
+	}
 }
 
 func checkSimpleTypes(currentPath []string, va, vb reflect.Value,
-	ka reflect.Kind, diffs *[]Diff, visited map[similarVisit]bool, checkUnordered bool) {
+	ka reflect.Kind, kb reflect.Kind, diffs *[]Diff, visited map[similarVisit]bool, checkUnordered bool) {
+	na, aIsNumeric := asNumeric(va, ka)
+	nb, bIsNumeric := asNumeric(vb, kb)
+
+	if aIsNumeric && bIsNumeric {
+		if na != nb {
+			*diffs = append(*diffs, newDiff(currentPath, CommonDiff{na, nb}))
+		}
+		return
+	}
+
 	ta, tb := va.Type(), vb.Type()
 	if ta != tb {
 		*diffs = append(*diffs, newDiff(currentPath, TypeDiff{va.Interface(), vb.Interface()}))
@@ -237,12 +260,6 @@ func checkSimpleTypes(currentPath []string, va, vb reflect.Value,
 	switch ka {
 	case reflect.Bool:
 		simpleEqDiff(va.Bool(), vb.Bool(), currentPath, diffs)
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		simpleEqDiff(va.Int(), vb.Int(), currentPath, diffs)
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-		simpleEqDiff(va.Uint(), vb.Uint(), currentPath, diffs)
-	case reflect.Float32, reflect.Float64:
-		simpleEqDiff(va.Float(), vb.Float(), currentPath, diffs)
 	case reflect.Complex64, reflect.Complex128:
 		simpleEqDiff(va.Complex(), vb.Complex(), currentPath, diffs)
 	case reflect.UnsafePointer:

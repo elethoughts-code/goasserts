@@ -214,7 +214,7 @@ func Test_Similar_simple_second_level_differences(t *testing.T) {
 			a: map[string]int{"a": 1, "b": 2},
 			b: map[string]int{"a": 1, "b": 3},
 			result: diffs(
-				d(path("[b]"), diff.CommonDiff{A: int64(2), B: int64(3)}),
+				d(path("[b]"), diff.CommonDiff{A: float64(2), B: float64(3)}),
 			),
 		},
 		{
@@ -224,7 +224,7 @@ func Test_Similar_simple_second_level_differences(t *testing.T) {
 				B int
 			}{1, 3},
 			result: diffs(
-				d(path("[B]"), diff.CommonDiff{A: int64(2), B: int64(3)}),
+				d(path("[B]"), diff.CommonDiff{A: float64(2), B: float64(3)}),
 			),
 		},
 		{
@@ -250,7 +250,7 @@ func Test_Similar_simple_second_level_differences(t *testing.T) {
 			a: map[KeyStruct]int{{"a"}: 1, {"b"}: 2},
 			b: map[KeyStruct]int{{"a"}: 1, {"b"}: 3},
 			result: diffs(
-				d(path("[{b}]"), diff.CommonDiff{A: int64(2), B: int64(3)}),
+				d(path("[{b}]"), diff.CommonDiff{A: float64(2), B: float64(3)}),
 			),
 		},
 		{
@@ -266,7 +266,7 @@ func Test_Similar_simple_second_level_differences(t *testing.T) {
 			a: SampleStruct{A: 1},
 			b: SampleStruct{A: 2},
 			result: diffs(
-				d(path("[A]"), diff.CommonDiff{A: int64(1), B: int64(2)}),
+				d(path("[A]"), diff.CommonDiff{A: float64(1), B: float64(2)}),
 			),
 		},
 		{
@@ -396,9 +396,9 @@ func Test_Similar_multi_level_differences(t *testing.T) {
 				"D": nil,
 			},
 			result: diffs(
-				d(path("[A]"), diff.CommonDiff{A: int64(1), B: int64(2)}),
+				d(path("[A]"), diff.CommonDiff{A: float64(1), B: float64(2)}),
 				d(path("[B]"), diff.CommonDiff{A: "b1", B: "b2"}),
-				d(path("[C]", "[A]", "[2]", "[D]"), diff.CommonDiff{A: uint64(3), B: uint64(4)}),
+				d(path("[C]", "[A]", "[2]", "[D]"), diff.CommonDiff{A: float64(3), B: float64(4)}),
 				d(path("[D]", "[A]"), diff.KeyNotFoundDiff{Key: "A", A: true, B: false}),
 				d(path("[D]", "[B]"), diff.KeyNotFoundDiff{Key: "B", A: true, B: false}),
 				d(path("[D]", "[C]"), diff.KeyNotFoundDiff{Key: "C", A: true, B: false}),
@@ -432,9 +432,9 @@ func Test_Similar_multi_level_differences(t *testing.T) {
 				D: nil,
 			},
 			result: diffs(
-				d(path("[A]"), diff.CommonDiff{A: int64(1), B: int64(2)}),
+				d(path("[A]"), diff.CommonDiff{A: float64(1), B: float64(2)}),
 				d(path("[B]"), diff.CommonDiff{A: "b1", B: "b2"}),
-				d(path("[C]", "[A]", "[2]", "[D]"), diff.CommonDiff{A: uint64(3), B: uint64(4)}),
+				d(path("[C]", "[A]", "[2]", "[D]"), diff.CommonDiff{A: float64(3), B: float64(4)}),
 				d(path("[D]", "[A]"), diff.KeyNotFoundDiff{Key: "A", A: true, B: false}),
 				d(path("[D]", "[B]"), diff.KeyNotFoundDiff{Key: "B", A: true, B: false}),
 				d(path("[D]", "[C]"), diff.KeyNotFoundDiff{Key: "C", A: true, B: false}),
@@ -468,9 +468,9 @@ func Test_Similar_multi_level_differences(t *testing.T) {
 				D: &os2,
 			},
 			result: diffs(
-				d(path("[A]"), diff.CommonDiff{A: int64(1), B: int64(2)}),
+				d(path("[A]"), diff.CommonDiff{A: float64(1), B: float64(2)}),
 				d(path("[B]"), diff.CommonDiff{A: "b1", B: "b2"}),
-				d(path("[C]", "[A]", "[2]", "[D]"), diff.CommonDiff{A: uint64(3), B: uint64(4)}),
+				d(path("[C]", "[A]", "[2]", "[D]"), diff.CommonDiff{A: float64(3), B: float64(4)}),
 				d(path("[D]", "[B]", "[x]"), diff.KeyNotFoundDiff{Key: "x", A: true, B: false}),
 				d(path("[D]", "[B]", "[y]"), diff.KeyNotFoundDiff{Key: "y", A: true, B: false}),
 				d(path("[D]", "[B]", "[z]"), diff.KeyNotFoundDiff{Key: "z", A: true, B: false}),
@@ -506,9 +506,9 @@ func Test_Similar_multi_level_differences(t *testing.T) {
 				"D": &os2,
 			},
 			result: diffs(
-				d(path("[A]"), diff.CommonDiff{A: int64(1), B: int64(2)}),
+				d(path("[A]"), diff.CommonDiff{A: float64(1), B: float64(2)}),
 				d(path("[B]"), diff.CommonDiff{A: "b1", B: "b2"}),
-				d(path("[C]", "[A]", "[2]", "[D]"), diff.CommonDiff{A: uint64(3), B: uint64(4)}),
+				d(path("[C]", "[A]", "[2]", "[D]"), diff.CommonDiff{A: float64(3), B: float64(4)}),
 				d(path("[D]", "[B]", "[x]"), diff.KeyNotFoundDiff{Key: "x", A: true, B: false}),
 				d(path("[D]", "[B]", "[y]"), diff.KeyNotFoundDiff{Key: "y", A: true, B: false}),
 				d(path("[D]", "[B]", "[z]"), diff.KeyNotFoundDiff{Key: "z", A: true, B: false}),
@@ -656,9 +656,9 @@ func Test_Similar_Unordered_simple_one_level_differences(t *testing.T) {
 				"D": nil,
 			},
 			result: diffs(
-				d(path("[A]"), diff.CommonDiff{A: int64(1), B: int64(2)}),
+				d(path("[A]"), diff.CommonDiff{A: float64(1), B: float64(2)}),
 				d(path("[B]"), diff.CommonDiff{A: "b1", B: "b2"}),
-				d(path("[C]", "[A]", "[2]", "[D]"), diff.CommonDiff{A: uint64(3), B: uint64(4)}),
+				d(path("[C]", "[A]", "[2]", "[D]"), diff.CommonDiff{A: float64(3), B: float64(4)}),
 				d(path("[D]", "[A]"), diff.KeyNotFoundDiff{Key: "A", A: true, B: false}),
 				d(path("[D]", "[B]"), diff.KeyNotFoundDiff{Key: "B", A: true, B: false}),
 				d(path("[D]", "[C]"), diff.KeyNotFoundDiff{Key: "C", A: true, B: false}),
@@ -692,9 +692,9 @@ func Test_Similar_Unordered_simple_one_level_differences(t *testing.T) {
 				D: nil,
 			},
 			result: diffs(
-				d(path("[A]"), diff.CommonDiff{A: int64(1), B: int64(2)}),
+				d(path("[A]"), diff.CommonDiff{A: float64(1), B: float64(2)}),
 				d(path("[B]"), diff.CommonDiff{A: "b1", B: "b2"}),
-				d(path("[C]", "[A]", "[2]", "[D]"), diff.CommonDiff{A: uint64(3), B: uint64(4)}),
+				d(path("[C]", "[A]", "[2]", "[D]"), diff.CommonDiff{A: float64(3), B: float64(4)}),
 				d(path("[D]", "[A]"), diff.KeyNotFoundDiff{Key: "A", A: true, B: false}),
 				d(path("[D]", "[B]"), diff.KeyNotFoundDiff{Key: "B", A: true, B: false}),
 				d(path("[D]", "[C]"), diff.KeyNotFoundDiff{Key: "C", A: true, B: false}),
@@ -728,9 +728,9 @@ func Test_Similar_Unordered_simple_one_level_differences(t *testing.T) {
 				D: &os2,
 			},
 			result: diffs(
-				d(path("[A]"), diff.CommonDiff{A: int64(1), B: int64(2)}),
+				d(path("[A]"), diff.CommonDiff{A: float64(1), B: float64(2)}),
 				d(path("[B]"), diff.CommonDiff{A: "b1", B: "b2"}),
-				d(path("[C]", "[A]", "[2]", "[D]"), diff.CommonDiff{A: uint64(3), B: uint64(4)}),
+				d(path("[C]", "[A]", "[2]", "[D]"), diff.CommonDiff{A: float64(3), B: float64(4)}),
 				d(path("[D]", "[B]", "[x]"), diff.KeyNotFoundDiff{Key: "x", A: true, B: false}),
 				d(path("[D]", "[B]", "[y]"), diff.KeyNotFoundDiff{Key: "y", A: true, B: false}),
 				d(path("[D]", "[B]", "[z]"), diff.KeyNotFoundDiff{Key: "z", A: true, B: false}),
@@ -766,9 +766,9 @@ func Test_Similar_Unordered_simple_one_level_differences(t *testing.T) {
 				"D": &os2,
 			},
 			result: diffs(
-				d(path("[A]"), diff.CommonDiff{A: int64(1), B: int64(2)}),
+				d(path("[A]"), diff.CommonDiff{A: float64(1), B: float64(2)}),
 				d(path("[B]"), diff.CommonDiff{A: "b1", B: "b2"}),
-				d(path("[C]", "[A]", "[2]", "[D]"), diff.CommonDiff{A: uint64(3), B: uint64(4)}),
+				d(path("[C]", "[A]", "[2]", "[D]"), diff.CommonDiff{A: float64(3), B: float64(4)}),
 				d(path("[D]", "[B]", "[x]"), diff.KeyNotFoundDiff{Key: "x", A: true, B: false}),
 				d(path("[D]", "[B]", "[y]"), diff.KeyNotFoundDiff{Key: "y", A: true, B: false}),
 				d(path("[D]", "[B]", "[z]"), diff.KeyNotFoundDiff{Key: "z", A: true, B: false}),
