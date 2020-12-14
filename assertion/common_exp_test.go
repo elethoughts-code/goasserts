@@ -427,7 +427,7 @@ func Test_Similar_should_pass(t *testing.T) {
 		D: &os2,
 	}
 	d := map[string]interface{}{
-		"A": 1,
+		"A": float64(1),
 		"B": "b1",
 		"C": OtherStruct{
 			A: []OtherStruct{{D: 1}, {D: 2}, {D: 3}},
@@ -441,6 +441,7 @@ func Test_Similar_should_pass(t *testing.T) {
 
 	// When
 	assert.That(a).Similar(b)
+	assert.That(float64(3)).Similar(3)
 	assert.That(a).Not().Similar(c)
 	assert.That(a).Similar(d)
 	assert.That([]interface{}{d["A"], d["B"], d["C"], d["D"]}).Similar([]interface{}{
