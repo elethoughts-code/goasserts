@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/elethoughts-code/goasserts/assertion"
+	"github.com/elethoughts-code/goasserts/diff"
 	mocks "github.com/elethoughts-code/goasserts/mocks/assertion"
 	"github.com/golang/mock/gomock"
 )
@@ -725,6 +726,24 @@ func Test_Similar_unordered_should_not_pass_3(t *testing.T) {
 	}{
 		{"c"}, {"b"}, {"d"},
 	})
+}
+
+func Test_Similar_unordered_should_not_pass_4(t *testing.T) {
+	// Given
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	// Expectation
+	tMock := mocks.NewMockPublicTB(ctrl)
+	assert := assertion.New(tMock)
+	tMock.EXPECT().Helper().AnyTimes()
+	tMock.EXPECT().Error("Value have following dissimilarities with expectation :\n" +
+		"Path [] : Matcher Never failed for value : 3")
+
+	// When
+	assert.That(3).Similar(diff.Matcher("Never", func(i interface{}) bool {
+		return false
+	}))
 }
 
 func Test_Similar_from_json_should_pass(t *testing.T) {

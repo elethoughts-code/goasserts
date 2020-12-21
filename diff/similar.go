@@ -152,7 +152,7 @@ type MatcherDiff struct {
 }
 
 func (fd MatcherDiff) Error() string {
-	return fmt.Sprintf("Matcher %s failed for value : %v", fd.Name, fd.Name)
+	return fmt.Sprintf("Matcher %s failed for value : %v", fd.Name, fd.Value)
 }
 
 // nolint:gocognit,gocyclo,nestif
