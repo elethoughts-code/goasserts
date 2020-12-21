@@ -38,7 +38,7 @@ func (td TypeDiff) Error() string {
 	return fmt.Sprintf("value types diff\nType of A=%v\nType of B=%v", reflect.TypeOf(td.A), reflect.TypeOf(td.B))
 }
 
-// TypeDiff is a function difference error between two values A and B. (all functions are considered different).
+// FuncDiff is a function difference error between two values A and B. (all functions are considered different).
 type FuncDiff CommonDiff
 
 func (fd FuncDiff) Error() string {

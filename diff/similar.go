@@ -125,6 +125,36 @@ func unorderedEq(a, b []interface{}) bool {
 	return true
 }
 
+type SimilarMatcher struct {
+	Name    string
+	Matches func(interface{}) bool
+}
+
+func Any() SimilarMatcher {
+	return SimilarMatcher{
+		Name: "Any",
+		Matches: func(i interface{}) bool {
+			return true
+		},
+	}
+}
+
+func Matcher(name string, matches func(interface{}) bool) SimilarMatcher {
+	return SimilarMatcher{
+		Name:    name,
+		Matches: matches,
+	}
+}
+
+type MatcherDiff struct {
+	Name  string
+	Value interface{}
+}
+
+func (fd MatcherDiff) Error() string {
+	return fmt.Sprintf("Matcher %s failed for value : %v", fd.Name, fd.Name)
+}
+
 // nolint:gocognit,gocyclo,nestif
 func findSimilarityDiffs(currentPath []string, va, vb reflect.Value, diffs *[]Diff,
 	visited map[similarVisit]bool, checkUnordered bool) {
@@ -146,6 +176,17 @@ func findSimilarityDiffs(currentPath []string, va, vb reflect.Value, diffs *[]Di
 	vb = dereference(vb)
 
 	ka, kb := va.Kind(), vb.Kind()
+
+	if kb == reflect.Struct {
+		i := vb.Interface()
+		if m, ok := i.(SimilarMatcher); ok {
+			aValue := va.Interface()
+			if !m.Matches(aValue) {
+				*diffs = append(*diffs, newDiff(currentPath, MatcherDiff{m.Name, aValue}))
+			}
+			return
+		}
+	}
 
 	// Check func
 	if ka == reflect.Func {
