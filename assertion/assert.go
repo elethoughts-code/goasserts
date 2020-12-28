@@ -47,6 +47,7 @@ type Expectation interface {
 	AttributeParser
 	HTTPRecorderParser
 	ReflectTransformer
+	ReaderTransformer
 }
 
 type assert struct {
