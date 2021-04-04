@@ -25,6 +25,11 @@ linters:
     - exhaustivestruct
     - paralleltest
     - wrapcheck
+    - cyclop
+    - predeclared
+    - scopelint
+    - maligned
+    - interfacer
 issues:
   exclude-rules:
     - path: _test\.go

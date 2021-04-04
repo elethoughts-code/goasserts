@@ -72,7 +72,10 @@ func (exp *expectation) Any(m func(v interface{}) bool) {
 func (exp *expectation) Every(matchers []func(v interface{}) bool) {
 	exp.t.Helper()
 	exp.Matches(Unordered(matchers, func(v, e interface{}) bool {
-		currentM := e.(func(v interface{}) bool)
+		currentM, ok := e.(func(v interface{}) bool)
+		if !ok {
+			panic("expectation variable e should be of type 'func(v interface{}) bool'")
+		}
 		return currentM(v)
 	}))
 }

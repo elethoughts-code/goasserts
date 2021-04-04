@@ -89,7 +89,7 @@ func isNil(v reflect.Value, k reflect.Kind) bool {
 }
 
 func slicesOfComparable(v reflect.Value, len int) ([]interface{}, reflect.Type, bool) {
-	var typ reflect.Type = nil
+	var typ reflect.Type
 	s := make([]interface{}, len)
 	for i := 0; i < len; i++ {
 		cVal := v.Index(i)
