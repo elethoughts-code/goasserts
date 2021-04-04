@@ -30,6 +30,7 @@ linters:
     - scopelint
     - maligned
     - interfacer
+    - ifshort
 issues:
   exclude-rules:
     - path: _test\.go
