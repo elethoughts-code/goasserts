@@ -102,7 +102,7 @@ func Test_AsError_should_pass(t *testing.T) {
 func Test_Common_Matchers_should_fail(t *testing.T) {
 	// Mock preparation
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+
 	var e *myError
 
 	testEntries := []struct {
@@ -181,7 +181,7 @@ func Test_Common_Matchers_should_fail(t *testing.T) {
 func Test_Common_Matchers_should_fail_with_error(t *testing.T) {
 	// Mock preparation
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+
 	var e *myError
 
 	testEntries := []struct {
@@ -299,7 +299,7 @@ func Test_NoDiff_should_pass(t *testing.T) {
 func Test_NoDiff_should_not_pass_1(t *testing.T) {
 	// Given
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+
 	os := OtherStruct{D: 0, E: true}
 	a := SampleStruct{
 		A: 1,
@@ -339,7 +339,7 @@ func Test_NoDiff_should_not_pass_1(t *testing.T) {
 func Test_NoDiff_should_not_pass_2(t *testing.T) {
 	// Given
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+
 	os := OtherStruct{D: 0, E: true}
 	os2 := OtherStruct{D: 0, E: true}
 	a := SampleStruct{
@@ -460,7 +460,7 @@ func Test_Similar_should_pass(t *testing.T) {
 func Test_Similar_should_not_pass_1(t *testing.T) {
 	// Given
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+
 	os := OtherStruct{D: 0, E: true}
 	a := SampleStruct{
 		A: 1,
@@ -500,7 +500,7 @@ func Test_Similar_should_not_pass_1(t *testing.T) {
 func Test_Similar_should_not_pass_2(t *testing.T) {
 	// Given
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+
 	os := OtherStruct{D: 0, E: true}
 	os2 := OtherStruct{D: 0, E: true}
 	a := SampleStruct{
@@ -624,7 +624,7 @@ func Test_Similar_unordered_should_pass(t *testing.T) {
 func Test_Similar_unordered_should_not_pass_1(t *testing.T) {
 	// Given
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+
 	os := OtherStruct{D: 0, E: true}
 	a := SampleStruct{
 		A: 1,
@@ -664,7 +664,7 @@ func Test_Similar_unordered_should_not_pass_1(t *testing.T) {
 func Test_Similar_unordered_should_not_pass_2(t *testing.T) {
 	// Given
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+
 	os := OtherStruct{D: 0, E: true}
 	os2 := OtherStruct{D: 0, E: true}
 	a := SampleStruct{
@@ -705,7 +705,6 @@ func Test_Similar_unordered_should_not_pass_2(t *testing.T) {
 func Test_Similar_unordered_should_not_pass_3(t *testing.T) {
 	// Given
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
 
 	// Expectation
 	tMock := mocks.NewMockPublicTB(ctrl)
@@ -731,7 +730,6 @@ func Test_Similar_unordered_should_not_pass_3(t *testing.T) {
 func Test_Similar_unordered_should_not_pass_4(t *testing.T) {
 	// Given
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
 
 	// Expectation
 	tMock := mocks.NewMockPublicTB(ctrl)
@@ -769,7 +767,6 @@ func Test_Similar_from_json_should_pass(t *testing.T) {
 func Test_Similar_from_json_should_fail_when_bad_json(t *testing.T) {
 	// Given
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
 
 	// Expectation
 	tMock := mocks.NewMockPublicTB(ctrl)

@@ -151,7 +151,6 @@ func Test_Any_should_pass(t *testing.T) {
 func Test_Slice_Matchers_should_fail(t *testing.T) {
 	// Mock preparation
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
 
 	testEntries := []struct {
 		assertFunc func(assert assertion.Assert)
@@ -240,7 +239,6 @@ func Test_Slice_Matchers_should_fail(t *testing.T) {
 func Test_Slice_Matchers_should_fail_with_error(t *testing.T) {
 	// Mock preparation
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
 
 	testEntries := []struct {
 		assertFunc func(assert assertion.Assert)

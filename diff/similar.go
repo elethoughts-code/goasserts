@@ -89,7 +89,7 @@ func isNil(v reflect.Value, k reflect.Kind) bool {
 }
 
 func slicesOfComparable(v reflect.Value, len int) ([]interface{}, reflect.Type, bool) {
-	var typ reflect.Type = nil
+	var typ reflect.Type
 	s := make([]interface{}, len)
 	for i := 0; i < len; i++ {
 		cVal := v.Index(i)
@@ -322,8 +322,7 @@ func checkSimpleTypes(currentPath []string, va, vb reflect.Value,
 func checkSimilarMaps(currentPath []string, va, vb reflect.Value, diffs *[]Diff,
 	visited map[similarVisit]bool, checkUnordered bool) {
 	lenVa := va.Len()
-	lenDiff := lenVa - vb.Len()
-	if lenDiff != 0 {
+	if lenDiff := lenVa - vb.Len(); lenDiff != 0 {
 		*diffs = append(*diffs, newDiff(currentPath, LenDiff{CommonDiff{va.Interface(), vb.Interface()}, lenDiff}))
 		return
 	}

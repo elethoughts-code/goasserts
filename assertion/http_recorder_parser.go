@@ -99,35 +99,50 @@ func (exp *expectation) Response() Expectation {
 
 func (exp *expectation) Status() Expectation {
 	exp.Response()
-	response := exp.v.(*http.Response)
+	response, ok := exp.v.(*http.Response)
+	if !ok {
+		panic("value should be of type *http.Response")
+	}
 	exp.v = response.StatusCode
 	return exp
 }
 
 func (exp *expectation) Headers() Expectation {
 	exp.Response()
-	response := exp.v.(*http.Response)
+	response, ok := exp.v.(*http.Response)
+	if !ok {
+		panic("value should be of type *http.Response")
+	}
 	exp.v = response.Header
 	return exp
 }
 
 func (exp *expectation) Header(header string) Expectation {
 	exp.Response()
-	response := exp.v.(*http.Response)
+	response, ok := exp.v.(*http.Response)
+	if !ok {
+		panic("value should be of type *http.Response")
+	}
 	exp.v = response.Header.Get(header)
 	return exp
 }
 
 func (exp *expectation) Cookies() Expectation {
 	exp.Response()
-	response := exp.v.(*http.Response)
+	response, ok := exp.v.(*http.Response)
+	if !ok {
+		panic("value should be of type *http.Response")
+	}
 	exp.v = response.Cookies()
 	return exp
 }
 
 func (exp *expectation) Cookie(cookie string) Expectation {
 	exp.Response()
-	response := exp.v.(*http.Response)
+	response, ok := exp.v.(*http.Response)
+	if !ok {
+		panic("value should be of type *http.Response")
+	}
 	cookies := response.Cookies()
 	for _, c := range cookies {
 		if c.Name == cookie {

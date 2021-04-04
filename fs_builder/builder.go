@@ -55,23 +55,20 @@ func (d *dirBuilder) Root() D {
 }
 
 func (d *dirBuilder) Remove() {
-	err := os.Remove(d.name)
-	if err != nil {
+	if err := os.Remove(d.name); err != nil {
 		panic(err)
 	}
 }
 
 func (d *dirBuilder) RemoveAll() {
-	err := os.RemoveAll(d.name)
-	if err != nil {
+	if err := os.RemoveAll(d.name); err != nil {
 		panic(err)
 	}
 }
 
 func (d *dirBuilder) Dir(name string, perm os.FileMode) D {
 	name = filepath.Join(d.Name(), name)
-	err := os.Mkdir(name, perm)
-	if err != nil {
+	if err := os.Mkdir(name, perm); err != nil {
 		panic(err)
 	}
 	return &dirBuilder{name: name, parent: d}
@@ -110,8 +107,7 @@ func (f *fileBuilder) Root() D {
 }
 
 func (f *fileBuilder) Remove() {
-	err := os.Remove(f.Name())
-	if err != nil {
+	if err := os.Remove(f.Name()); err != nil {
 		panic(err)
 	}
 }
@@ -121,8 +117,7 @@ func (f *fileBuilder) Parent() D {
 }
 
 func (f *fileBuilder) Write(content []byte) F {
-	err := ioutil.WriteFile(f.name, content, 0600)
-	if err != nil {
+	if err := ioutil.WriteFile(f.name, content, 0600); err != nil {
 		panic(err)
 	}
 	return f

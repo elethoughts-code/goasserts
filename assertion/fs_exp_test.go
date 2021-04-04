@@ -45,7 +45,6 @@ func Test_File_exists_should_check_file_existence(t *testing.T) {
 func Test_Fs_Matchers_should_fail(t *testing.T) {
 	// Mock preparation
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
 
 	tmpFolder := fsBuilder.TmpDir("", "my_folder_1")
 

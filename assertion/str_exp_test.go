@@ -67,7 +67,6 @@ func Test_HasSuffix_should_pass(t *testing.T) {
 func Test_String_Matchers_should_fail(t *testing.T) {
 	// Mock preparation
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
 
 	testEntries := []struct {
 		assertFunc func(assert assertion.Assert)
@@ -104,7 +103,6 @@ func Test_String_Matchers_should_fail(t *testing.T) {
 func Test_String_Matchers_should_fail_with_error(t *testing.T) {
 	// Mock preparation
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
 
 	testEntries := []struct {
 		assertFunc func(assert assertion.Assert)

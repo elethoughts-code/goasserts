@@ -186,8 +186,7 @@ func checkSlices(currentPath []string, va, vb reflect.Value, diffs *[]Diff, visi
 		return
 	}
 	lenVa := va.Len()
-	lenDiff := lenVa - vb.Len()
-	if lenDiff != 0 {
+	if lenDiff := lenVa - vb.Len(); lenDiff != 0 {
 		*diffs = append(*diffs, newDiff(currentPath, LenDiff{CommonDiff{va.Interface(), vb.Interface()}, lenDiff}))
 		return
 	}
@@ -206,8 +205,7 @@ func checkMaps(currentPath []string, va, vb reflect.Value, diffs *[]Diff, visite
 		return
 	}
 	lenVa := va.Len()
-	lenDiff := lenVa - vb.Len()
-	if lenDiff != 0 {
+	if lenDiff := lenVa - vb.Len(); lenDiff != 0 {
 		*diffs = append(*diffs, newDiff(currentPath, LenDiff{CommonDiff{va.Interface(), vb.Interface()}, lenDiff}))
 		return
 	}

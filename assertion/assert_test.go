@@ -200,7 +200,6 @@ func Test_assert_deep_eq_negation_should_pass(t *testing.T) {
 func Test_assert_eq_should_not_pass(t *testing.T) {
 	// Mock preparation
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
 
 	// Given
 	testEntries := []struct {
@@ -252,7 +251,6 @@ func Test_assert_eq_should_not_pass(t *testing.T) {
 func Test_assert_deep_eq_should_not_pass(t *testing.T) {
 	// Mock preparation
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
 
 	// Given
 	testEntries := []struct {
@@ -305,7 +303,6 @@ func Test_assert_deep_eq_should_not_pass(t *testing.T) {
 func Test_assert_eq_negation_should_not_pass(t *testing.T) {
 	// Mock preparation
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
 
 	// Given
 	testEntries := []struct {
@@ -354,7 +351,6 @@ func Test_assert_eq_negation_should_not_pass(t *testing.T) {
 func Test_assert_eq_should_not_pass_with_custom_message(t *testing.T) {
 	// Mock preparation
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
 
 	// Given
 	tMock := mocks.NewMockPublicTB(ctrl)
@@ -371,7 +367,6 @@ func Test_assert_eq_should_not_pass_with_custom_message(t *testing.T) {
 func Test_assert_eq_should_not_pass_with_custom_formatted_message(t *testing.T) {
 	// Mock preparation
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
 
 	// Given
 	tMock := mocks.NewMockPublicTB(ctrl)
@@ -388,7 +383,6 @@ func Test_assert_eq_should_not_pass_with_custom_formatted_message(t *testing.T) 
 func Test_assert_eq_should_not_pass_and_fail(t *testing.T) {
 	// Mock preparation
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
 
 	// Given
 	tMock := mocks.NewMockPublicTB(ctrl)
@@ -405,7 +399,6 @@ func Test_assert_eq_should_not_pass_and_fail(t *testing.T) {
 func Test_assert_eq_should_not_pass_silently(t *testing.T) {
 	// Mock preparation
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
 
 	// Given
 	tMock := mocks.NewMockPublicTB(ctrl)
@@ -422,7 +415,6 @@ func Test_assert_eq_should_not_pass_silently(t *testing.T) {
 func Test_assert_eq_should_not_pass_silently_and_fail(t *testing.T) {
 	// Mock preparation
 	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
 
 	// Given
 	tMock := mocks.NewMockPublicTB(ctrl)
